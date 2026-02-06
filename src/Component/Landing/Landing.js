@@ -3,10 +3,12 @@ import { MessageCircle, Users, Zap, Shield, ArrowRight } from "lucide-react";
 const Landing = () => {
   return (
     <div
-      className="pt-[120px] flex-1 h-full p-6 flex flex-col justify-center items-center text-center relative overflow-auto"
+      className="flex-1 p-6 flex flex-col justify-start items-center text-center relative overflow-auto"
       style={{
         background: "linear-gradient(to bottom, var(--bg-gradient-mid), var(--bg-gradient-end))",
         color: "var(--text-main)",
+        paddingTop: "max(10vh, 80px)",
+        minHeight: "100%",
       }}
     >
       {/* Animated Background Elements */}
@@ -32,32 +34,32 @@ const Landing = () => {
       </div>
 
       {/* Main Content */}
-      <div className="pt-[120px] relative z-10 max-w-2xl animate-fadeInUp">
+      <div className="relative z-10 max-w-2xl w-full animate-fadeInUp pb-8">
         {/* Icon */}
         <div className="flex justify-center mb-6">
           <div
-            className="w-24 h-24 rounded-3xl flex items-center justify-center shadow-2xl animate-float"
+            className="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl flex items-center justify-center shadow-2xl animate-float"
             style={{
               backgroundColor: "var(--accent-primary)",
             }}
           >
-            <MessageCircle className="w-12 h-12 text-black" strokeWidth={2.5} />
+            <MessageCircle className="w-10 h-10 sm:w-12 sm:h-12 text-black" strokeWidth={2.5} />
           </div>
         </div>
 
         {/* Title */}
-        <h2 className="text-5xl font-bold mb-4 bg-gradient-to-r from-teal-400 to-purple-400 bg-clip-text text-transparent">
+        <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-teal-400 to-purple-400 bg-clip-text text-transparent px-4">
           Welcome to Talkify 🌿
         </h2>
 
         {/* Subtitle */}
-        <p className="text-lg max-w-md mx-auto mb-8 leading-relaxed" style={{ color: "var(--text-muted)" }}>
+        <p className="text-base sm:text-lg max-w-md mx-auto mb-8 leading-relaxed px-4" style={{ color: "var(--text-muted)" }}>
           Select a user from the sidebar to start a real-time conversation.
           Messages are secure, fast, and seamless.
         </p>
 
         {/* Features Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8 px-4">
           {/* Feature 1 */}
           <div
             className="p-5 rounded-xl border transition-all duration-300 hover:scale-105 hover:shadow-lg"
@@ -133,7 +135,7 @@ const Landing = () => {
 
         {/* CTA Card */}
         <div
-          className="mt-8 px-8 py-6 rounded-2xl border shadow-xl animate-pulse-subtle"
+          className="mt-8 px-6 sm:px-8 py-6 rounded-2xl border shadow-xl animate-pulse-subtle mx-4"
           style={{
             backgroundColor: "var(--bg-card)",
             borderColor: "var(--border-main)",
@@ -155,7 +157,7 @@ const Landing = () => {
         </div>
 
         {/* Quick Stats */}
-        <div className="mt-12 flex justify-center gap-8">
+        <div className="mt-8 sm:mt-12 flex justify-center gap-6 sm:gap-8 flex-wrap">
           <div className="text-center">
             <div className="text-2xl font-bold" style={{ color: "var(--accent-primary)" }}>
               ⚡

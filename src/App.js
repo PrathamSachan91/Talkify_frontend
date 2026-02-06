@@ -7,6 +7,7 @@ import "./Component/theme.css"
 import Signin from "./Component/Signin/Signin"
 import ChatDashboard from './Component/Chat/ChatDashboard';
 import ImageView from './Component/Chat/imageView';
+import EditProfile from './Component/EditProfile/editProfile';
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
           <Route path="/" element={<Landing />} />
           <Route path="/chat/:conversationId" element={<ChatDashboard />} />
           <Route path="/image-view" element={<ImageView />} />
+          <Route path="/editProfile" element={<EditProfile />} />
         </Route>
       </Routes>
     </BrowserRouter>

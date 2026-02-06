@@ -14,6 +14,7 @@ import CreateGroupModal from "./groupModal";
 
 const SideBar = () => {
   const currentUser = useSelector((state) => state.auth.user);
+  const isLoggedIn=useSelector((state)=> state.auth.isAuthenticated);
   const navigate = useNavigate();
   const socket = useSocket();
   const queryClient = useQueryClient();
@@ -37,6 +38,8 @@ const SideBar = () => {
     queryKey: ["broadcast"],
     queryFn: fetchBroadcast,
   });
+
+  
 
   /* ---------------- OPEN PRIVATE CHAT ---------------- */
   const openChatMutation = useMutation({
@@ -93,17 +96,19 @@ const SideBar = () => {
       <aside className="w-64 h-full flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
           <div className="w-8 h-8 border-3 border-teal-500 border-t-transparent rounded-full animate-spin"></div>
-          <span className="text-sm text-gray-400">Loading conversations...</span>
+          <span className="text-sm text-gray-400">
+            Loading conversations...
+          </span>
         </div>
       </aside>
     );
   }
 
   const filteredUsers = users.filter((u) => u.auth_id !== currentUser?.auth_id);
-
+  if (!isLoggedIn) return null;
   return (
     <aside
-      className="hidden sm:flex sm:w-64 lg:w-72 xl:w-80 h-full flex-col shadow-lg"
+      className="sm:flex sm:w-64 lg:w-72 xl:w-80 h-full flex-col shadow-lg"
       style={{
         backgroundColor: "var(--bg-card)",
         borderRight: "1px solid var(--border-main)",
@@ -124,7 +129,10 @@ const SideBar = () => {
         >
           Conversations
         </h2>
-        <p className="text-xs opacity-60 mt-1" style={{ color: "var(--text-main)" }}>
+        <p
+          className="text-xs opacity-60 mt-1"
+          style={{ color: "var(--text-main)" }}
+        >
           {filteredUsers.length + groups.length + (broadcast ? 1 : 0)} total
         </p>
       </div>
@@ -366,7 +374,17 @@ const SideBar = () => {
                     color: "#020617",
                   }}
                 >
-                  {user.user_name.charAt(0).toUpperCase()}
+                  {user?.profile_image ? (
+                    <img
+                      src={user.profile_image}
+                      alt={user.user_name}
+                      className="w-full h-full object-cover rounded-full"
+                    />
+                  ) : (
+                    <span className="font-semibold text-sm text-black">
+                      {user?.user_name?.charAt(0).toUpperCase()}
+                    </span>
+                  )}
                 </div>
                 {/* Online indicator - you can add logic to show/hide this */}
                 <div

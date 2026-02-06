@@ -3,15 +3,15 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
 import { useEffect, useRef, useState } from "react";
 import { useSocket } from "../../socket/socketContext";
-import { 
-  Paperclip, 
-  Send, 
-  Image as ImageIcon, 
+import {
+  Paperclip,
+  Send,
+  Image as ImageIcon,
   X,
   CheckCheck,
   MoreVertical,
   Phone,
-  Video
+  Video,
 } from "lucide-react";
 import {
   fetchMessages,
@@ -66,7 +66,10 @@ const ChatDashboard = () => {
     });
 
     socket.on("user_typing", (data) => {
-      if (data.conversationId === conversationId && data.userId !== currentUser?.auth_id) {
+      if (
+        data.conversationId === conversationId &&
+        data.userId !== currentUser?.auth_id
+      ) {
         setIsTyping(true);
         setTimeout(() => setIsTyping(false), 3000);
       }
@@ -89,7 +92,7 @@ const ChatDashboard = () => {
   });
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    bottomRef.current?.scrollIntoView({ behavior: "auto" });
   }, [messages]);
 
   // Handle typing indicator
@@ -99,14 +102,17 @@ const ChatDashboard = () => {
 
   // Handle image click - navigate to ImageView
   const handleImageClick = (messageImages) => {
-    const urls = messageImages.map((img) => `http://localhost:3001${img}`);
+    const urls = messageImages.map((img) => img);
     const query = encodeURIComponent(JSON.stringify(urls));
     navigate(`/image-view?images=${query}`);
   };
 
   if (isLoading) {
     return (
-      <div className="flex-1 flex items-center justify-center" style={{ background: 'var(--bg-gradient-start)' }}>
+      <div
+        className="flex-1 flex items-center justify-center"
+        style={{ background: "var(--bg-gradient-start)" }}
+      >
         <div className="flex flex-col items-center gap-3">
           <div className="typing-loader">
             <span></span>
@@ -135,27 +141,41 @@ const ChatDashboard = () => {
             <div
               className="w-11 h-11 rounded-full flex items-center justify-center font-semibold text-lg shadow-lg transition-transform hover:scale-105"
               style={{
-                background: "linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%)",
+                background:
+                  "linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%)",
                 color: "#020617",
               }}
             >
-              {convo?.type === "group"
-                ? convo.group_name?.charAt(0).toUpperCase()
-                : receiver?.user_name?.charAt(0).toUpperCase() || "P"}
+              {convo?.type === "group" ? (
+                convo.group_name?.charAt(0).toUpperCase()
+              ) : receiver?.profile_image ? (
+                <img
+                  src={receiver.profile_image}
+                  alt={receiver.user_name}
+                  className="w-full h-full object-cover rounded-full"
+                />
+              ) : (
+                <span className="font-semibold text-sm text-black">
+                  {receiver?.user_name?.charAt(0).toUpperCase() || "P"}
+                </span>
+              )}
             </div>
             {/* Online status indicator */}
-            <div 
+            <div
               className="absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full border-2"
               style={{
                 backgroundColor: "var(--online)",
                 borderColor: "var(--bg-card)",
-                boxShadow: "0 0 8px rgba(34, 197, 94, 0.6)"
+                boxShadow: "0 0 8px rgba(34, 197, 94, 0.6)",
               }}
             />
           </div>
-          
+
           <div>
-            <h3 className="font-semibold text-base" style={{ color: "var(--text-main)" }}>
+            <h3
+              className="font-semibold text-base"
+              style={{ color: "var(--text-main)" }}
+            >
               {convo?.type === "private"
                 ? receiver?.user_name || "Chat"
                 : convo?.group_name}
@@ -178,7 +198,7 @@ const ChatDashboard = () => {
         </div>
 
         <div className="flex items-center gap-2">
-          <button 
+          <button
             className="icon-button p-2 rounded-lg transition-all"
             style={{
               color: "var(--text-muted)",
@@ -186,7 +206,7 @@ const ChatDashboard = () => {
           >
             <Phone size={18} />
           </button>
-          <button 
+          <button
             className="icon-button p-2 rounded-lg transition-all"
             style={{
               color: "var(--text-muted)",
@@ -194,7 +214,7 @@ const ChatDashboard = () => {
           >
             <Video size={18} />
           </button>
-          <button 
+          <button
             className="icon-button p-2 rounded-lg transition-all"
             style={{
               color: "var(--text-muted)",
@@ -217,10 +237,11 @@ const ChatDashboard = () => {
       >
         {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full gap-4 opacity-60">
-            <div 
+            <div
               className="w-20 h-20 rounded-full flex items-center justify-center"
               style={{
-                background: "linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%)",
+                background:
+                  "linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%)",
                 color: "#020617",
                 fontSize: "2rem",
               }}
@@ -237,15 +258,18 @@ const ChatDashboard = () => {
         ) : (
           messages.map((msg, index) => {
             const isMe = msg.sender_id === currentUser?.auth_id;
-            const showAvatar = !isMe && showSenderName && 
-              (index === messages.length - 1 || messages[index + 1]?.sender_id !== msg.sender_id);
+            const showAvatar =
+              !isMe &&
+              showSenderName &&
+              (index === messages.length - 1 ||
+                messages[index + 1]?.sender_id !== msg.sender_id);
 
             return (
               <div
                 key={msg.id}
                 className={`message-wrapper flex items-end gap-2 ${isMe ? "flex-row-reverse" : "flex-row"}`}
                 style={{
-                  animation: "messageSlideIn 0.3s ease-out"
+                  animation: "messageSlideIn 0.3s ease-out",
                 }}
               >
                 {/* Avatar */}
@@ -253,27 +277,40 @@ const ChatDashboard = () => {
                   <div
                     className="w-8 h-8 rounded-full flex items-center justify-center font-semibold text-sm flex-shrink-0 shadow-md"
                     style={{
-                      background: "linear-gradient(135deg, var(--accent-secondary) 0%, var(--accent-primary) 100%)",
+                      background:
+                        "linear-gradient(135deg, var(--accent-secondary) 0%, var(--accent-primary) 100%)",
                       color: "#020617",
                     }}
                   >
-                    {msg.sender?.user_name?.charAt(0).toUpperCase()}
+                    {msg.sender?.profile_image ? (
+                      <img
+                        src={msg.sender.profile_image}
+                        alt={msg.sender.user_name}
+                        className="w-full h-full object-cover rounded-full"
+                      />
+                    ) : (
+                      <span className="font-semibold text-sm text-black">
+                        {msg.sender?.user_name?.charAt(0).toUpperCase() || "P"}
+                      </span>
+                    )}
                   </div>
                 ) : showSenderName && !isMe ? (
                   <div className="w-8 h-8 flex-shrink-0" />
                 ) : null}
 
                 {/* Message Bubble */}
-                <div className={`flex flex-col ${isMe ? "items-end" : "items-start"} max-w-[70%]`}>
+                <div
+                  className={`flex flex-col ${isMe ? "items-end" : "items-start"} max-w-[70%]`}
+                >
                   {showSenderName && !isMe && (
-                    <span 
+                    <span
                       className="text-xs font-medium mb-1 ml-3"
                       style={{ color: "var(--text-label)" }}
                     >
                       {msg.sender?.user_name}
                     </span>
                   )}
-                  
+
                   <div
                     className={`message-bubble px-4 py-2.5 rounded-2xl shadow-lg backdrop-blur-sm ${
                       isMe ? "rounded-br-md" : "rounded-bl-md"
@@ -293,7 +330,7 @@ const ChatDashboard = () => {
                         onClick={() => handleImageClick(msg.images)}
                       >
                         <img
-                          src={`http://localhost:3001${msg.images[0]}`}
+                          src={msg.images[0]}
                           alt="sent"
                           className="max-w-64 max-h-64 object-contain rounded-xl transition-transform group-hover:scale-[1.02]"
                         />
@@ -319,18 +356,26 @@ const ChatDashboard = () => {
                     )}
 
                     {/* Timestamp & Status */}
-                    <div className={`flex items-center gap-1 mt-1 ${isMe ? "justify-end" : "justify-start"}`}>
-                      <span 
+                    <div
+                      className={`flex items-center gap-1 mt-1 ${isMe ? "justify-end" : "justify-start"}`}
+                    >
+                      <span
                         className="text-[10px] opacity-70"
-                        style={{ color: isMe ? "#020617" : "var(--text-muted)" }}
+                        style={{
+                          color: isMe ? "#020617" : "var(--text-muted)",
+                        }}
                       >
-                        {new Date(msg.createdAt).toLocaleTimeString('en-US', { 
-                          hour: '2-digit', 
-                          minute: '2-digit' 
+                        {new Date(msg.createdAt).toLocaleTimeString("en-US", {
+                          hour: "2-digit",
+                          minute: "2-digit",
                         })}
                       </span>
                       {isMe && (
-                        <CheckCheck size={14} className="opacity-70" style={{ color: "#020617" }} />
+                        <CheckCheck
+                          size={14}
+                          className="opacity-70"
+                          style={{ color: "#020617" }}
+                        />
                       )}
                     </div>
                   </div>
@@ -339,14 +384,15 @@ const ChatDashboard = () => {
             );
           })
         )}
-        
+
         {/* Typing Indicator */}
         {isTyping && (
           <div className="flex items-end gap-2">
             <div
               className="w-8 h-8 rounded-full flex items-center justify-center font-semibold text-sm shadow-md"
               style={{
-                background: "linear-gradient(135deg, var(--accent-secondary) 0%, var(--accent-primary) 100%)",
+                background:
+                  "linear-gradient(135deg, var(--accent-secondary) 0%, var(--accent-primary) 100%)",
                 color: "#020617",
               }}
             >
@@ -367,7 +413,7 @@ const ChatDashboard = () => {
             </div>
           </div>
         )}
-        
+
         <div ref={bottomRef} />
       </div>
 
@@ -375,17 +421,17 @@ const ChatDashboard = () => {
       {previews && previews.length > 0 && (
         <div
           className="px-4 py-3 border-t flex gap-3 flex-wrap backdrop-blur-xl"
-          style={{ 
+          style={{
             backgroundColor: "var(--bg-card)",
             borderColor: "var(--border-divider)",
           }}
         >
           {previews.map((src, idx) => (
-            <div 
-              key={idx} 
+            <div
+              key={idx}
               className="relative group image-preview-item"
               style={{
-                animation: "fadeIn 0.2s ease-in"
+                animation: "fadeIn 0.2s ease-in",
               }}
             >
               <img
@@ -393,7 +439,7 @@ const ChatDashboard = () => {
                 alt="preview"
                 className="w-20 h-20 object-cover rounded-xl border-2 shadow-md"
                 style={{
-                  borderColor: "var(--border-focus)"
+                  borderColor: "var(--border-focus)",
                 }}
               />
 
@@ -490,7 +536,8 @@ const ChatDashboard = () => {
               }}
               onFocus={(e) => {
                 e.target.style.borderColor = "var(--border-focus)";
-                e.target.style.boxShadow = "0 0 0 3px rgba(45, 212, 191, 0.1), var(--shadow-glow)";
+                e.target.style.boxShadow =
+                  "0 0 0 3px rgba(45, 212, 191, 0.1), var(--shadow-glow)";
               }}
               onBlur={(e) => {
                 e.target.style.borderColor = "var(--border-input)";
@@ -502,10 +549,14 @@ const ChatDashboard = () => {
           {/* Send Button */}
           <button
             type="submit"
-            disabled={sendMessageMutation.isLoading || (!text.trim() && images.length === 0)}
+            disabled={
+              sendMessageMutation.isLoading ||
+              (!text.trim() && images.length === 0)
+            }
             className="send-button px-5 py-3.5 rounded-xl font-semibold flex items-center gap-2 transition-all flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
             style={{
-              background: "linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%)",
+              background:
+                "linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%)",
               color: "#020617",
               boxShadow: "var(--shadow-glow)",
             }}
@@ -592,7 +643,9 @@ const ChatDashboard = () => {
         }
 
         @keyframes typingBounce {
-          0%, 60%, 100% {
+          0%,
+          60%,
+          100% {
             transform: translateY(0);
           }
           30% {
@@ -652,7 +705,11 @@ const ChatDashboard = () => {
         }
 
         .messages-container::-webkit-scrollbar-thumb {
-          background: linear-gradient(180deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+          background: linear-gradient(
+            180deg,
+            var(--accent-primary) 0%,
+            var(--accent-secondary) 100%
+          );
           border-radius: 10px;
         }
 
