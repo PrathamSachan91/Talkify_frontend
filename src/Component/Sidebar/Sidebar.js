@@ -18,8 +18,8 @@ const SideBar = () => {
   const navigate = useNavigate();
   const socket = useSocket();
   const queryClient = useQueryClient();
-  const online=useSelector((state)=> state.online)
-
+  const onlineArray=useSelector((state)=> state.online)
+  const online=new Set(onlineArray);
   const [openingUserId, setOpeningUserId] = useState(null);
   const [open, setOpen] = useState(false);
 

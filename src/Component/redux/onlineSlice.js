@@ -2,12 +2,21 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const onlineSlice = createSlice({
   name: "online",
-  initialState: new Set(),
+  initialState: [], // 👈 ARRAY, not Set
   reducers: {
-    setAll: (_, action) => new Set(action.payload),
+    setAll: (_, action) => {
+      return action.payload; // payload = [1, 2, 3]
+    },
     update: (state, action) => {
       const { userId, status } = action.payload;
-      status === "online" ? state.add(userId) : state.delete(userId);
+
+      if (status === "online" && !state.includes(userId)) {
+        state.push(userId);
+      }
+
+      if (status === "offline") {
+        return state.filter((id) => id !== userId);
+      }
     },
   },
 });

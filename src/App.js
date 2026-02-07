@@ -12,6 +12,7 @@ import { useSocket } from "./socket/socketContext";
 import { useStore } from "react-redux";
 import { useEffect } from "react";
 import { registerSocketHandlers } from "./socket/registerSocketHandler";
+import ChatGallery from "./Component/Chat/chatGallery";
 
 function App() {
   const socket = useSocket();
@@ -37,6 +38,7 @@ function App() {
           <Route path="/chat/:conversationId" element={<ChatDashboard />} />
           <Route path="/image-view" element={<ImageView />} />
           <Route path="/editProfile" element={<EditProfile />} />
+          <Route path="/gallery/:conversationId" element={<ChatGallery />} />
         </Route>
       </Routes>
     </BrowserRouter>

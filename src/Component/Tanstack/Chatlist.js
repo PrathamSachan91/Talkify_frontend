@@ -61,3 +61,8 @@ export const fetchBroadcast = async () => {
   const res = await api.get("/boardcastList");
   return res.data;
 };
+
+export const fetchConversationImages = async (conversationId) => {
+  const response = await api.get(`/messages/images/${conversationId}`);
+  return response.data;
+};

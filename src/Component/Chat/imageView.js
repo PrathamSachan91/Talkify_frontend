@@ -151,7 +151,7 @@ const ImageView = () => {
 
   return (
     <div
-      className="min-h-screen flex flex-col"
+      className="flex-1 h-full overflow-y-auto"
       style={{
         background: 'linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-mid) 50%, var(--bg-gradient-end) 100%)',
       }}
