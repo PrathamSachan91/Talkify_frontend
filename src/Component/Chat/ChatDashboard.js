@@ -32,8 +32,10 @@ const ChatDashboard = () => {
   const [images, setImages] = useState([]);
   const [previews, setPreviews] = useState([]);
   const [isTyping, setIsTyping] = useState(false);
+  const online=useSelector((state)=> state.online)
   const fileInputRef = useRef(null);
   const inputRef = useRef(null);
+  const typingTimeout = useRef(null);
 
   const { data: convo } = useQuery({
     queryKey: ["conversation-meta", conversationId],
@@ -55,31 +57,71 @@ const ChatDashboard = () => {
   });
 
   useEffect(() => {
-    if (!conversationId) return;
-    queryClient.invalidateQueries({
-      queryKey: ["messages", conversationId],
-    });
+    if (!socket || !conversationId) return;
+
     socket.emit("join_conversation", conversationId);
 
-    socket.on("receive_message", (message) => {
+    const handleReceive = () => {
       queryClient.invalidateQueries({ queryKey: ["messages", conversationId] });
-    });
+    };
 
-    socket.on("user_typing", (data) => {
+    const handleTypingEvent = (data) => {
       if (
         data.conversationId === conversationId &&
         data.userId !== currentUser?.auth_id
       ) {
         setIsTyping(true);
-        setTimeout(() => setIsTyping(false), 3000);
+
+        if (typingTimeout.current) {
+          clearTimeout(typingTimeout.current);
+        }
+
+        typingTimeout.current = setTimeout(() => {
+          setIsTyping(false);
+        }, 2000);
       }
-    });
+    };
+
+    socket.on("receive_message", handleReceive);
+    socket.on("user_typing", handleTypingEvent);
 
     return () => {
-      socket.off("receive_message");
-      socket.off("user_typing");
+      socket.off("receive_message", handleReceive);
+      socket.off("user_typing", handleTypingEvent);
     };
-  }, [conversationId, socket, queryClient, currentUser]);
+  }, [socket, conversationId, currentUser, queryClient]);
+
+  // useEffect(() => {
+  //   if (!socket) return;
+
+  //   const handleInitialOnline = (users) => {
+  //     setOnline(new Set(users));
+  //   };
+
+  //   socket.on("online_users", handleInitialOnline);
+
+  //   return () => {
+  //     socket.off("online_users", handleInitialOnline);
+  //   };
+  // }, [socket]);
+
+  // useEffect(() => {
+  //   if (!socket) return;
+
+  //   const handleStatus = ({ userId, status }) => {
+  //     setOnline((prev) => {
+  //       const next = new Set(prev);
+  //       status === "online" ? next.add(userId) : next.delete(userId);
+  //       return next;
+  //     });
+  //   };
+
+  //   socket.on("user_status", handleStatus);
+
+  //   return () => {
+  //     socket.off("user_status", handleStatus);
+  //   };
+  // }, [socket]);
 
   const sendMessageMutation = useMutation({
     mutationFn: sendMessage,
@@ -106,6 +148,8 @@ const ChatDashboard = () => {
     const query = encodeURIComponent(JSON.stringify(urls));
     navigate(`/image-view?images=${query}`);
   };
+
+  const isOnline = convo?.type === "private" && online.has(receiver?.auth_id);
 
   if (isLoading) {
     return (
@@ -161,14 +205,16 @@ const ChatDashboard = () => {
               )}
             </div>
             {/* Online status indicator */}
-            <div
-              className="absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full border-2"
-              style={{
-                backgroundColor: "var(--online)",
-                borderColor: "var(--bg-card)",
-                boxShadow: "0 0 8px rgba(34, 197, 94, 0.6)",
-              }}
-            />
+            {convo?.type === "private" && isOnline && (
+              <div
+                className="absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full border-2"
+                style={{
+                  backgroundColor: "var(--online)",
+                  borderColor: "var(--bg-card)",
+                  boxShadow: "0 0 8px rgba(34, 197, 94, 0.6)",
+                }}
+              />
+            )}
           </div>
 
           <div>
@@ -181,18 +227,19 @@ const ChatDashboard = () => {
                 : convo?.group_name}
             </h3>
             <p className="text-xs" style={{ color: "var(--text-muted)" }}>
-              {isTyping ? (
-                <span className="flex items-center gap-1">
-                  <span className="typing-dots">
-                    <span></span>
-                    <span></span>
-                    <span></span>
+              {convo?.type === "private" &&
+                (isTyping ? (
+                  <span className="flex items-center gap-1">
+                    <span className="typing-dots">
+                      <span></span>
+                      <span></span>
+                      <span></span>
+                    </span>
+                    typing...
                   </span>
-                  typing...
-                </span>
-              ) : (
-                "Active now"
-              )}
+                ) : (
+                  <span>{isOnline ? "Active" : "Offline"}</span>
+                ))}
             </p>
           </div>
         </div>
