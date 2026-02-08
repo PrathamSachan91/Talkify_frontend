@@ -128,7 +128,7 @@ Ensure you have the following installed:
 
 ### Step 1: Clone the Repository
 ```bash
-git clone https://github.com/yourusername/talkify.git
+git clone [[https://github.com/yourusername/talkify.git]](https://github.com/PrathamSachan91/Talkify_frontend.git)
 cd talkify
 ```
 
