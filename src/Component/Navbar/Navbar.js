@@ -347,6 +347,7 @@ const Navbar = () => {
       {/* Edit Profile Modal - Rendered outside navbar */}
       <EditProfileModal
         isOpen={isEditProfileOpen}
+        mode="user"
         onClose={() => setIsEditProfileOpen(false)}
       />
     </>

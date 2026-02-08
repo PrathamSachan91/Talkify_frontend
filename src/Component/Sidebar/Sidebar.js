@@ -18,8 +18,8 @@ const SideBar = () => {
   const navigate = useNavigate();
   const socket = useSocket();
   const queryClient = useQueryClient();
-  const onlineArray=useSelector((state)=> state.online)
-  const online=new Set(onlineArray);
+  const onlineArray = useSelector((state) => state.online);
+  const online = new Set(onlineArray);
   const [openingUserId, setOpeningUserId] = useState(null);
   const [open, setOpen] = useState(false);
 
@@ -236,7 +236,15 @@ const SideBar = () => {
                     color: "#020617",
                   }}
                 >
-                  {group.group_name.charAt(0).toUpperCase()}
+                  {group.group_image ? (
+                    <img
+                      src={group.group_image}
+                      alt={group.group_name}
+                      className="w-full h-full object-cover rounded-full"
+                    />
+                  ) : (
+                    <span>{group.group_name?.charAt(0).toUpperCase()}</span>
+                  )}
                 </div>
 
                 <div className="flex-1 min-w-0">

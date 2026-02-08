@@ -4,17 +4,26 @@ import { useDispatch, useSelector } from "react-redux";
 import { editProfile } from "../Tanstack/editProfile";
 import { setUser } from "../redux/AuthSlice";
 import { Camera, User, X, Check } from "lucide-react";
+import { editGroup } from "../Tanstack/Chatlist";
+import { useQueryClient } from "@tanstack/react-query";
 
-const EditProfileModal = ({ isOpen, onClose }) => {
+
+const EditProfileModal = ({ isOpen, onClose, mode, group, conversationId }) => {
   const user = useSelector((state) => state.auth);
-  const dispatch = useDispatch();
-  const [name, setName] = useState(user.user_name || "");
+  const initialName = mode === "group" ? group?.group_name : user.user_name;
+
+  const initialImage =
+    mode === "group" ? group?.group_image : user.profile_image;
+
+  const [name, setName] = useState(initialName || "");
   const [image, setImage] = useState(null);
-  const [preview, setPreview] = useState(user.profile_image);
+  const [preview, setPreview] = useState(initialImage || null);
+  const dispatch = useDispatch();
   const [showSuccess, setShowSuccess] = useState(false);
   const [alert, setAlert] = useState(null);
+  const queryClient = useQueryClient();
 
-  const mutation = useMutation({
+  const userMutation = useMutation({
     mutationFn: editProfile,
     onSuccess: (data) => {
       dispatch(setUser(data));
@@ -29,6 +38,23 @@ const EditProfileModal = ({ isOpen, onClose }) => {
       setAlert(error.message || "Failed to update profile");
     },
   });
+
+  const groupMutation = useMutation({
+    mutationFn: editGroup,
+    onSuccess: () => {
+      setShowSuccess(true);
+      queryClient.invalidateQueries({
+      queryKey: ["conversation-meta", conversationId],
+    });
+
+      setTimeout(() => {
+        setShowSuccess(false);
+        onClose();
+      }, 1500);
+    },
+  });
+
+  const mutation = mode === "group" ? groupMutation : userMutation;
 
   const handleImageChange = (e) => {
     const file = e.target.files?.[0];
@@ -52,14 +78,25 @@ const EditProfileModal = ({ isOpen, onClose }) => {
     e.preventDefault();
 
     if (!name.trim()) {
-      setAlert("Please enter your name");
+      setAlert(
+        mode === "group" ? "Please enter group name" : "Please enter your name",
+      );
       return;
     }
 
-    mutation.mutate({
-      user_name: name.trim(),
-      profile_image: image,
-    });
+    mutation.mutate(
+      mode === "group"
+        ? {
+            group_id: group.id,
+            group_name: name.trim(),
+            group_image: image,
+            conversation_id: conversationId,
+          }
+        : {
+            user_name: name.trim(),
+            profile_image: image,
+          },
+    );
   };
 
   const handleClose = () => {
@@ -128,7 +165,7 @@ const EditProfileModal = ({ isOpen, onClose }) => {
               }}
             >
               <Check size={16} />
-              <span className="text-sm font-semibold">Profile updated!</span>
+              <span className="text-sm font-semibold">{mode === "group" ? "Group updated!" : "Profile updated!"}</span>
             </div>
           )}
 
@@ -149,10 +186,12 @@ const EditProfileModal = ({ isOpen, onClose }) => {
                 className="text-xl font-bold"
                 style={{ color: "var(--text-main)" }}
               >
-                Edit Profile
+                {mode === "group" ? "Edit Group" : "Edit Profile"}
               </h2>
               <p className="text-sm" style={{ color: "var(--text-muted)" }}>
-                Update your profile information
+                {mode === "group"
+                  ? "Update group information"
+                  : "Update your profile information"}
               </p>
             </div>
 
@@ -236,7 +275,7 @@ const EditProfileModal = ({ isOpen, onClose }) => {
                 className="block text-sm font-medium"
                 style={{ color: "var(--text-label)" }}
               >
-                Display Name
+                {mode === "group" ? "Group Name" : "Display Name"}
               </label>
               <div className="relative">
                 <input

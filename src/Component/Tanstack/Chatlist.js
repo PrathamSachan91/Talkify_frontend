@@ -66,3 +66,17 @@ export const fetchConversationImages = async (conversationId) => {
   const response = await api.get(`/messages/images/${conversationId}`);
   return response.data;
 };
+
+export const editGroup = async ({ group_name, group_image,conversation_id }) => {
+  const formData = new FormData();
+
+  if (group_name) formData.append("group_name", group_name);
+  if (group_image) formData.append("group_image", group_image);
+  formData.append("conversation_id",conversation_id);
+
+  const res = await api.post("/editGroup", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+
+  return res.data;
+};
