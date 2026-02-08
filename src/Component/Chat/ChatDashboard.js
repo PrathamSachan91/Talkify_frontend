@@ -33,7 +33,7 @@ const ChatDashboard = () => {
   const [previews, setPreviews] = useState([]);
   const [isTyping, setIsTyping] = useState(false);
   const onlineArray = useSelector((state) => state.online);
-  const online=new Set(onlineArray);
+  const online = new Set(onlineArray);
   const fileInputRef = useRef(null);
   const inputRef = useRef(null);
   const typingTimeout = useRef(null);
@@ -43,17 +43,21 @@ const ChatDashboard = () => {
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (showDropdown && dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+      if (
+        showDropdown &&
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target)
+      ) {
         setShowDropdown(false);
       }
     };
 
     if (showDropdown) {
-      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener("mousedown", handleClickOutside);
     }
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [showDropdown]); // FIXED: Changed from useSelector to useState
 
@@ -188,7 +192,7 @@ const ChatDashboard = () => {
                 />
               ) : (
                 <span className="font-semibold text-sm text-black">
-                  {receiver?.user_name?.charAt(0).toUpperCase() || "P"}
+                  {receiver?.user_name?.charAt(0).toUpperCase() || "📢"}
                 </span>
               )}
             </div>
@@ -276,152 +280,192 @@ const ChatDashboard = () => {
                     borderColor: "var(--border-main)",
                   }}
                 >
-              {/* Menu Items */}
-              <div className="py-1">
-                {/* Gallery Button */}
-                <button
-                  className="w-full px-4 py-2.5 flex items-center gap-3 transition-colors duration-150"
-                  style={{ color: "var(--text-main)" }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor =
-                      "rgba(20, 184, 166, 0.1)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = "transparent";
-                  }}
-                  onClick={() => {
-                    // Navigate to gallery
-                    navigate(`/gallery/${conversationId}`);
-                    setShowDropdown(false);
-                  }}
-                >
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                    />
-                  </svg>
-                  <span className="text-sm font-medium">Gallery</span>
-                </button>
+                  {/* Menu Items */}
+                  <div className="py-1">
+                    {/* Gallery Button */}
+                    <button
+                      className="w-full px-4 py-2.5 flex items-center gap-3 transition-colors duration-150"
+                      style={{ color: "var(--text-main)" }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor =
+                          "rgba(20, 184, 166, 0.1)";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = "transparent";
+                      }}
+                      onClick={() => {
+                        // Navigate to gallery
+                        navigate(`/gallery/${conversationId}`);
+                        setShowDropdown(false);
+                      }}
+                    >
+                      <svg
+                        className="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                        />
+                      </svg>
+                      <span className="text-sm font-medium">Gallery</span>
+                    </button>
 
-                {/* Search Messages Button */}
-                <button
-                  className="w-full px-4 py-2.5 flex items-center gap-3 transition-colors duration-150"
-                  style={{ color: "var(--text-main)" }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor =
-                      "rgba(20, 184, 166, 0.1)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = "transparent";
-                  }}
-                  onClick={() => {
-                    // Implement search
-                    setShowDropdown(false);
-                  }}
-                >
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                    />
-                  </svg>
-                  <span className="text-sm font-medium">Search Messages</span>
-                </button>
+                    {convo.type === "group" && (
+                      <button
+                        className="w-full px-4 py-2.5 flex items-center gap-3 transition-colors duration-150"
+                        style={{ color: "var(--text-main)" }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor =
+                            "rgba(20, 184, 166, 0.1)";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = "transparent";
+                        }}
+                        onClick={() => {
+                          // Navigate to gallery
+                          navigate(`/gallery/${conversationId}`);
+                          setShowDropdown(false);
+                        }}
+                      >
+                        <svg
+                          className="w-5 h-5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                          />
+                        </svg>
+                        <span className="text-sm font-medium">Edit group info</span>
+                      </button>
+                    )}
 
-                {/* Mute Notifications */}
-                <button
-                  className="w-full px-4 py-2.5 flex items-center gap-3 transition-colors duration-150"
-                  style={{ color: "var(--text-main)" }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor =
-                      "rgba(20, 184, 166, 0.1)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = "transparent";
-                  }}
-                  onClick={() => {
-                    // Toggle mute
-                    setShowDropdown(false);
-                  }}
-                >
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-                    />
-                  </svg>
-                  <span className="text-sm font-medium">Mute Notifications</span>
-                </button>
+                    {/* Search Messages Button */}
+                    <button
+                      className="w-full px-4 py-2.5 flex items-center gap-3 transition-colors duration-150"
+                      style={{ color: "var(--text-main)" }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor =
+                          "rgba(20, 184, 166, 0.1)";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = "transparent";
+                      }}
+                      onClick={() => {
+                        // Implement search
+                        setShowDropdown(false);
+                      }}
+                    >
+                      <svg
+                        className="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                        />
+                      </svg>
+                      <span className="text-sm font-medium">
+                        Search Messages
+                      </span>
+                    </button>
 
-                <div
-                  className="my-1 border-t"
-                  style={{ borderColor: "var(--border-main)" }}
-                ></div>
+                    {/* Mute Notifications */}
+                    <button
+                      className="w-full px-4 py-2.5 flex items-center gap-3 transition-colors duration-150"
+                      style={{ color: "var(--text-main)" }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor =
+                          "rgba(20, 184, 166, 0.1)";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = "transparent";
+                      }}
+                      onClick={() => {
+                        // Toggle mute
+                        setShowDropdown(false);
+                      }}
+                    >
+                      <svg
+                        className="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+                        />
+                      </svg>
+                      <span className="text-sm font-medium">
+                        Mute Notifications
+                      </span>
+                    </button>
 
-                {/* Delete Conversation Button */}
-                <button
-                  className="w-full px-4 py-2.5 flex items-center gap-3 transition-colors duration-150"
-                  style={{ color: "var(--danger)" }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor =
-                      "rgba(239, 68, 68, 0.1)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = "transparent";
-                  }}
-                  onClick={() => {
-                    // Handle delete
-                    if (
-                      window.confirm(
-                        "Are you sure you want to delete this conversation?"
-                      )
-                    ) {
-                      // Implement delete logic
-                      setShowDropdown(false);
-                    }
-                  }}
-                >
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                    />
-                  </svg>
-                  <span className="text-sm font-medium">Delete Conversation</span>
-                </button>
-              </div>
-            </div>
-          </>
-        )}
+                    <div
+                      className="my-1 border-t"
+                      style={{ borderColor: "var(--border-main)" }}
+                    ></div>
+
+                    {/* Delete Conversation Button */}
+                    <button
+                      className="w-full px-4 py-2.5 flex items-center gap-3 transition-colors duration-150"
+                      style={{ color: "var(--danger)" }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor =
+                          "rgba(239, 68, 68, 0.1)";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = "transparent";
+                      }}
+                      onClick={() => {
+                        // Handle delete
+                        if (
+                          window.confirm(
+                            "Are you sure you want to delete this conversation?",
+                          )
+                        ) {
+                          // Implement delete logic
+                          setShowDropdown(false);
+                        }
+                      }}
+                    >
+                      <svg
+                        className="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                        />
+                      </svg>
+                      <span className="text-sm font-medium">
+                        Delete Conversation
+                      </span>
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>

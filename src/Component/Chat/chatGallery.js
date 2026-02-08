@@ -156,7 +156,8 @@ const ChatGallery = () => {
                   border: "1px solid var(--border-input)",
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = "var(--bg-input-focus)";
+                  e.currentTarget.style.backgroundColor =
+                    "var(--bg-input-focus)";
                   e.currentTarget.style.borderColor = "var(--border-focus)";
                 }}
                 onMouseLeave={(e) => {
@@ -173,10 +174,16 @@ const ChatGallery = () => {
                   style={{ color: "var(--text-main)" }}
                 >
                   <ImageIcon size={20} className="md:hidden flex-shrink-0" />
-                  <ImageIcon size={24} className="hidden md:block flex-shrink-0" />
+                  <ImageIcon
+                    size={24}
+                    className="hidden md:block flex-shrink-0"
+                  />
                   <span className="truncate">Gallery</span>
                 </h1>
-                <p className="text-xs md:text-sm truncate" style={{ color: "var(--text-muted)" }}>
+                <p
+                  className="text-xs md:text-sm truncate"
+                  style={{ color: "var(--text-muted)" }}
+                >
                   {filteredImages.length}{" "}
                   {filteredImages.length === 1 ? "image" : "images"}
                 </p>
@@ -205,7 +212,8 @@ const ChatGallery = () => {
                   }}
                   onFocus={(e) => {
                     e.target.style.borderColor = "var(--border-focus)";
-                    e.target.style.boxShadow = "0 0 0 3px rgba(45, 212, 191, 0.1)";
+                    e.target.style.boxShadow =
+                      "0 0 0 3px rgba(45, 212, 191, 0.1)";
                   }}
                   onBlur={(e) => {
                     e.target.style.borderColor = "var(--border-input)";
@@ -226,7 +234,8 @@ const ChatGallery = () => {
                   onClick={() => setGridSize(2)}
                   className="p-2 rounded transition-all"
                   style={{
-                    backgroundColor: gridSize === 2 ? "var(--accent-primary)" : "transparent",
+                    backgroundColor:
+                      gridSize === 2 ? "var(--accent-primary)" : "transparent",
                     color: gridSize === 2 ? "#020617" : "var(--text-muted)",
                   }}
                   title="2 columns"
@@ -237,7 +246,8 @@ const ChatGallery = () => {
                   onClick={() => setGridSize(3)}
                   className="p-2 rounded transition-all"
                   style={{
-                    backgroundColor: gridSize === 3 ? "var(--accent-primary)" : "transparent",
+                    backgroundColor:
+                      gridSize === 3 ? "var(--accent-primary)" : "transparent",
                     color: gridSize === 3 ? "#020617" : "var(--text-muted)",
                   }}
                   title="3 columns"
@@ -291,7 +301,8 @@ const ChatGallery = () => {
                   }}
                   onFocus={(e) => {
                     e.target.style.borderColor = "var(--border-focus)";
-                    e.target.style.boxShadow = "0 0 0 3px rgba(45, 212, 191, 0.1)";
+                    e.target.style.boxShadow =
+                      "0 0 0 3px rgba(45, 212, 191, 0.1)";
                   }}
                   onBlur={(e) => {
                     e.target.style.borderColor = "var(--border-input)";
@@ -302,7 +313,10 @@ const ChatGallery = () => {
 
               {/* Mobile Grid Size Toggle */}
               <div className="flex items-center gap-2">
-                <span className="text-sm font-medium" style={{ color: "var(--text-label)" }}>
+                <span
+                  className="text-sm font-medium"
+                  style={{ color: "var(--text-label)" }}
+                >
                   Grid:
                 </span>
                 <div
@@ -316,7 +330,10 @@ const ChatGallery = () => {
                     onClick={() => setGridSize(2)}
                     className="flex-1 py-2 rounded transition-all flex items-center justify-center gap-2"
                     style={{
-                      backgroundColor: gridSize === 2 ? "var(--accent-primary)" : "transparent",
+                      backgroundColor:
+                        gridSize === 2
+                          ? "var(--accent-primary)"
+                          : "transparent",
                       color: gridSize === 2 ? "#020617" : "var(--text-muted)",
                     }}
                   >
@@ -327,7 +344,10 @@ const ChatGallery = () => {
                     onClick={() => setGridSize(3)}
                     className="flex-1 py-2 rounded transition-all flex items-center justify-center gap-2"
                     style={{
-                      backgroundColor: gridSize === 3 ? "var(--accent-primary)" : "transparent",
+                      backgroundColor:
+                        gridSize === 3
+                          ? "var(--accent-primary)"
+                          : "transparent",
                       color: gridSize === 3 ? "#020617" : "var(--text-muted)",
                     }}
                   >
@@ -352,8 +372,16 @@ const ChatGallery = () => {
                   backgroundColor: "rgba(20, 184, 166, 0.1)",
                 }}
               >
-                <ImageIcon size={36} className="md:hidden" style={{ color: "var(--accent-primary)" }} />
-                <ImageIcon size={40} className="hidden md:block" style={{ color: "var(--accent-primary)" }} />
+                <ImageIcon
+                  size={36}
+                  className="md:hidden"
+                  style={{ color: "var(--accent-primary)" }}
+                />
+                <ImageIcon
+                  size={40}
+                  className="hidden md:block"
+                  style={{ color: "var(--accent-primary)" }}
+                />
               </div>
               <h3
                 className="text-lg md:text-xl font-semibold text-center px-4"
@@ -361,7 +389,10 @@ const ChatGallery = () => {
               >
                 {searchQuery ? "No images found" : "No images yet"}
               </h3>
-              <p className="text-sm md:text-base text-center px-4" style={{ color: "var(--text-muted)" }}>
+              <p
+                className="text-sm md:text-base text-center px-4"
+                style={{ color: "var(--text-muted)" }}
+              >
                 {searchQuery
                   ? "Try adjusting your search"
                   : "Images shared in this conversation will appear here"}
@@ -370,9 +401,7 @@ const ChatGallery = () => {
           ) : (
             <div
               className={`grid gap-3 md:gap-4 ${
-                gridSize === 2
-                  ? "grid-cols-2"
-                  : "grid-cols-2 lg:grid-cols-3"
+                gridSize === 2 ? "grid-cols-2" : "grid-cols-2 lg:grid-cols-3"
               }`}
             >
               {filteredImages.map((image, index) => (
@@ -413,21 +442,40 @@ const ChatGallery = () => {
                             color: "#020617",
                           }}
                         >
-                          {image.sender?.user_name?.charAt(0).toUpperCase() || "?"}
+                          {image.sender?.profile_image ? (
+                            <img
+                              src={image.sender.profile_image}
+                              alt={image.sender.user_name}
+                              className="w-full h-full object-cover rounded-full"
+                            />
+                          ) : (
+                            <span className="font-semibold text-sm text-black">
+                              {image.sender?.user_name?.charAt(0).toUpperCase()}
+                            </span>
+                          )}
                         </div>
                         <span className="text-xs md:text-sm font-medium truncate">
                           {image.sender?.user_name || "Unknown"}
                         </span>
                       </div>
                       <div className="flex items-center gap-1.5 md:gap-2 text-[10px] md:text-xs opacity-80">
-                        <Calendar size={10} className="md:hidden flex-shrink-0" />
-                        <Calendar size={12} className="hidden md:block flex-shrink-0" />
+                        <Calendar
+                          size={10}
+                          className="md:hidden flex-shrink-0"
+                        />
+                        <Calendar
+                          size={12}
+                          className="hidden md:block flex-shrink-0"
+                        />
                         <span className="truncate">
-                          {new Date(image.createdAt).toLocaleDateString("en-US", {
-                            month: "short",
-                            day: "numeric",
-                            year: "numeric",
-                          })}
+                          {new Date(image.createdAt).toLocaleDateString(
+                            "en-US",
+                            {
+                              month: "short",
+                              day: "numeric",
+                              year: "numeric",
+                            },
+                          )}
                         </span>
                       </div>
                     </div>
@@ -555,20 +603,24 @@ const ChatGallery = () => {
                       color: "#020617",
                     }}
                   >
-                    {selectedImage.sender?.user_name?.charAt(0).toUpperCase() || "?"}
+                    {selectedImage.sender?.user_name?.charAt(0).toUpperCase() ||
+                      "?"}
                   </div>
                   <div>
                     <p className="font-semibold">
                       {selectedImage.sender?.user_name || "Unknown"}
                     </p>
                     <p className="text-sm opacity-70">
-                      {new Date(selectedImage.createdAt).toLocaleString("en-US", {
-                        month: "short",
-                        day: "numeric",
-                        year: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
+                      {new Date(selectedImage.createdAt).toLocaleString(
+                        "en-US",
+                        {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        },
+                      )}
                     </p>
                   </div>
                 </div>

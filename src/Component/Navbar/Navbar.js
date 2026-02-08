@@ -107,12 +107,12 @@ const Navbar = () => {
                     <>
                       {/* Backdrop to close dropdown */}
                       <div
-                        className="fixed inset-0 z-10"
+                        className="fixed inset-0 z-[999]"
                         onClick={() => setShowDropdown(false)}
                       ></div>
 
                       <div
-                        className="absolute right-0 mt-3 w-56 rounded-xl shadow-2xl overflow-hidden z-20 border"
+                        className="absolute right-0 mt-3 w-56 rounded-xl shadow-2xl overflow-hidden z-[999] border"
                         style={{
                           backgroundColor: "var(--bg-card)",
                           borderColor: "var(--border-main)",
