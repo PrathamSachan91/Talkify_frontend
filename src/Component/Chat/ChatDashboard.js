@@ -185,15 +185,29 @@ const ChatDashboard = () => {
               }}
             >
               {convo?.type === "group" ? (
-                convo.group_image ? (
+                convo?.group_image ? (
                   <img
                     src={convo.group_image}
-                    alt={convo.group_name}
+                    alt={convo.group_name || "Group"}
                     className="w-full h-full object-cover rounded-full"
                   />
+                ) : convo?.group_name?.trim()?.charAt(0)?.toUpperCase() ? (
+                  <span>
+                    {convo?.group_name?.trim()?.charAt(0)?.toUpperCase()}
+                  </span>
                 ) : (
-                  <span>{convo.group_name?.charAt(0).toUpperCase()}</span>
+                  <span className="font-semibold text-sm text-black">📢</span>
                 )
+              ) : receiver?.profile_image ? (
+                <img
+                  src={receiver.profile_image}
+                  alt={receiver.name || "User"}
+                  className="w-full h-full object-cover rounded-full"
+                />
+              ) : receiver?.name?.trim()?.charAt(0)?.toUpperCase() ? (
+                <div className="w-full h-full rounded-full bg-gray-300 text-black flex items-center justify-center font-bold">
+                  {receiver?.name?.trim()?.charAt(0)?.toUpperCase()}
+                </div>
               ) : (
                 <span className="font-semibold text-sm text-black">📢</span>
               )}

@@ -22,6 +22,7 @@ const SideBar = () => {
   const online = new Set(onlineArray);
   const [openingUserId, setOpeningUserId] = useState(null);
   const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState("");
 
   /* ---------------- FETCH USERS ---------------- */
   const { data: users = [], isLoading } = useQuery({
@@ -103,7 +104,13 @@ const SideBar = () => {
     );
   }
 
-  const filteredUsers = users.filter((u) => u.auth_id !== currentUser?.auth_id);
+  const filteredUsers = users.filter((u) =>
+    u.user_name.toLowerCase().includes(search.toLowerCase()),
+  );
+  const filteredGroups = groups.filter((g) =>
+    g.group_name.toLowerCase().includes(search.toLowerCase()),
+  );
+
   if (!isLoggedIn) return null;
   return (
     <aside
@@ -168,6 +175,26 @@ const SideBar = () => {
           Create New Group
         </button>
       </div>
+      <input
+        placeholder="Search chat..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        className="flex align-center px-5 py-2 m-2 rounded-xl outline-none transition-all text-[15px]"
+        style={{
+          backgroundColor: "var(--bg-input)",
+          color: "var(--text-main)",
+          border: "1px solid var(--border-input)",
+        }}
+        onFocus={(e) => {
+          e.target.style.borderColor = "var(--border-focus)";
+          e.target.style.boxShadow =
+            "0 0 0 3px rgba(45, 212, 191, 0.1), var(--shadow-glow)";
+        }}
+        onBlur={(e) => {
+          e.target.style.borderColor = "var(--border-input)";
+          e.target.style.boxShadow = "none";
+        }}
+      />
 
       {/* Create Group Modal */}
       <CreateGroupModal
@@ -213,7 +240,7 @@ const SideBar = () => {
               </span>
             </div>
 
-            {groups.map((group) => (
+            {filteredGroups.map((group) => (
               <div
                 key={`group-${group.conversation_id}`}
                 className="px-3 py-2.5 mb-1 flex items-center gap-3 cursor-pointer transition-all duration-200 rounded-lg"

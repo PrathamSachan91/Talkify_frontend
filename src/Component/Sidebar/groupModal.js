@@ -11,7 +11,7 @@ const CreateGroupModal = ({ open, onClose, users, onCreate }) => {
 
   const toggleUser = (id) => {
     setSelected((prev) =>
-      prev.includes(id) ? prev.filter((u) => u !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((u) => u !== id) : [...prev, id],
     );
   };
 
@@ -46,14 +46,14 @@ const CreateGroupModal = ({ open, onClose, users, onCreate }) => {
   };
 
   const filteredUsers = users.filter((u) =>
-    u.user_name.toLowerCase().includes(searchQuery.toLowerCase())
+    u.user_name.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   return (
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 animate-fadeIn"
+        className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[999] animate-fadeIn"
         onClick={handleClose}
       >
         {/* Modal */}
@@ -95,7 +95,8 @@ const CreateGroupModal = ({ open, onClose, users, onCreate }) => {
               }}
               onMouseEnter={(e) => {
                 if (!isCreating) {
-                  e.currentTarget.style.backgroundColor = "rgba(239, 68, 68, 0.1)";
+                  e.currentTarget.style.backgroundColor =
+                    "rgba(239, 68, 68, 0.1)";
                   e.currentTarget.style.color = "var(--danger)";
                 }
               }}
@@ -208,7 +209,8 @@ const CreateGroupModal = ({ open, onClose, users, onCreate }) => {
                       }}
                       onMouseEnter={(e) => {
                         if (!isCreating) {
-                          e.currentTarget.style.backgroundColor = "rgba(20, 184, 166, 0.08)";
+                          e.currentTarget.style.backgroundColor =
+                            "rgba(20, 184, 166, 0.08)";
                         }
                       }}
                       onMouseLeave={(e) => {
@@ -231,11 +233,18 @@ const CreateGroupModal = ({ open, onClose, users, onCreate }) => {
                               ? "var(--accent-primary)"
                               : "transparent",
                             border: `2px solid ${
-                              isSelected ? "var(--accent-primary)" : "var(--border-input)"
+                              isSelected
+                                ? "var(--accent-primary)"
+                                : "var(--border-input)"
                             }`,
                           }}
                         >
-                          {isSelected && <Check className="w-3 h-3 text-black" strokeWidth={3} />}
+                          {isSelected && (
+                            <Check
+                              className="w-3 h-3 text-black"
+                              strokeWidth={3}
+                            />
+                          )}
                         </div>
                       </div>
 
@@ -247,7 +256,17 @@ const CreateGroupModal = ({ open, onClose, users, onCreate }) => {
                           color: "#020617",
                         }}
                       >
-                        {u.user_name.charAt(0).toUpperCase()}
+                        {u?.profile_image ? (
+                          <img
+                            src={u.profile_image}
+                            alt={u.user_name}
+                            className="w-full h-full object-cover rounded-full"
+                          />
+                        ) : (
+                          <span className="font-semibold text-sm text-black">
+                            {u?.user_name?.charAt(0).toUpperCase()}
+                          </span>
+                        )}
                       </div>
 
                       {/* User Name */}
@@ -282,7 +301,8 @@ const CreateGroupModal = ({ open, onClose, users, onCreate }) => {
               }}
               onMouseEnter={(e) => {
                 if (!isCreating) {
-                  e.currentTarget.style.backgroundColor = "rgba(100, 116, 139, 0.1)";
+                  e.currentTarget.style.backgroundColor =
+                    "rgba(100, 116, 139, 0.1)";
                 }
               }}
               onMouseLeave={(e) => {
@@ -294,7 +314,9 @@ const CreateGroupModal = ({ open, onClose, users, onCreate }) => {
 
             <button
               onClick={handleCreate}
-              disabled={isCreating || !groupName.trim() || selected.length === 0}
+              disabled={
+                isCreating || !groupName.trim() || selected.length === 0
+              }
               className="flex-1 px-4 py-2.5 rounded-lg font-medium text-sm transition-all duration-200 shadow-md hover:shadow-lg active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
               style={{
                 backgroundColor: "var(--accent-primary)",
