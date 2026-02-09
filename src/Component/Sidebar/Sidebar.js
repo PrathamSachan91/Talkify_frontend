@@ -103,10 +103,12 @@ const SideBar = () => {
       </aside>
     );
   }
+  const filterCurrent = users.filter((u) => u.auth_id !== currentUser?.auth_id);
 
-  const filteredUsers = users.filter((u) =>
+  const filteredUsers = filterCurrent.filter((u) =>
     u.user_name.toLowerCase().includes(search.toLowerCase()),
   );
+  
   const filteredGroups = groups.filter((g) =>
     g.group_name.toLowerCase().includes(search.toLowerCase()),
   );
