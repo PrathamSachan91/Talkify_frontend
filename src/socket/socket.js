@@ -9,7 +9,7 @@
 
 import { io } from "socket.io-client";
 
-const socket = io(import.meta.env.REACT_APP_API_URL, {
+const socket = io("https://talkify-backend-q62n.onrender.com", {
   autoConnect: false,
   withCredentials: true,
 });
