@@ -117,6 +117,12 @@ const ChatDashboard = () => {
     };
   }, [socket, conversationId, currentUser, queryClient]);
 
+  useEffect(() => {
+    if (!currentUser) {
+      navigate("/", { replace: true });
+    }
+  }, [currentUser, navigate]);
+
   const sendMessageMutation = useMutation({
     mutationFn: sendMessage,
     onSuccess: () => {
