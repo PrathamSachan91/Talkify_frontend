@@ -556,14 +556,14 @@ of this software and associated documentation files (the "Software")...
 ## 📊 Project Stats
 
 ### 🔐 Authentication
-![Login](screenshots/login.png)
+![Login](screenshot/login.png)
 
 ### 📊 Dashboard
-![Dashboard](screenshots/dashboard.png)
-![Dashboard](screenshots/chat.png)
-![Dashboard](screenshots/creategroup)
-![Dashboard](screenshots/edit)
-![Dashboard](screenshots/gallery.png)
-![Dashboard](screenshots/landing.png)
+![Dashboard](screenshot/dashboard.png)
+![Dashboard](screenshot/chat.png)
+![Dashboard](screenshot/creategroup)
+![Dashboard](screenshot/edit)
+![Dashboard](screenshot/gallery.png)
+![Dashboard](screenshot/landing.png)
 
 ---
