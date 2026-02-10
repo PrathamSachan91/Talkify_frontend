@@ -1,5 +1,5 @@
 import { Outlet } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { fetchMe } from "../Tanstack/Credential";
@@ -10,8 +10,9 @@ import { setUser, logout } from "../redux/AuthSlice";
 
 function Static() {
   const dispatch = useDispatch();
+  const user=useSelector((state)=>state.auth.user);
 
-  const { data, error, isLoading } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ["me"],
     queryFn: fetchMe,
     retry: false,
@@ -21,10 +22,10 @@ function Static() {
     if (data) {
       dispatch(setUser({ user: data }));
     }
-    if (error) {
+    else {
       dispatch(logout());
     }
-  }, [data, error, dispatch]);
+  }, [data,  dispatch]);
 
   if (isLoading) {
     return (
@@ -42,7 +43,7 @@ function Static() {
       <Navbar />
 
       <div className="flex flex-1 overflow-hidden">
-        <SideBar />
+        {user && <SideBar />}
         <Outlet />
       </div>
       <Footer />

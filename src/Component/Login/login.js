@@ -321,7 +321,7 @@ function Login() {
         </p>
       </div>
 
-      <style jsx>{`
+      <style>{`
         @keyframes slideIn {
           from {
             opacity: 0;
