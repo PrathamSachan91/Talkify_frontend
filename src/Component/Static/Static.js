@@ -38,7 +38,7 @@ function Static() {
   }
 
   return (
-    <div className="h-screen flex flex-col mw-748px">
+    <div className="h-screen flex flex-col min-w-[748px]">
       <Navbar />
 
       <div className="flex flex-1 overflow-hidden">
