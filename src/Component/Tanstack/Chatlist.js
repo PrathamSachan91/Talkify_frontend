@@ -57,8 +57,8 @@ export const getGroup = async (payload) => {
   return res.data;
 };
 
-export const deleteChat = async(conversationId) => {
-  const res=await api.post("deleteChat",conversationId);
+export const deleteChat = async (conversationId) => {
+  const res= await api.post("/deleteConversation",{conversationId,});
   return res.data;
 }
 

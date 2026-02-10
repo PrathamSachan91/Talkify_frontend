@@ -111,6 +111,7 @@ const ChatDashboard = () => {
 
     socket.on("receive_message", handleReceive);
     socket.on("user_typing", handleTypingEvent);
+    socket.on("delete_message",handleReceive);
 
     return () => {
       socket.off("receive_message", handleReceive);
