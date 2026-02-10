@@ -58,8 +58,17 @@ export const getGroup = async (payload) => {
 };
 
 export const deleteChat = async (conversationId) => {
-  const res= await api.post("/deleteConversation",{conversationId,});
-  return res.data;
+  await api.post("/deleteConversation",{conversationId,});
+  // return res.data;
+}
+
+export const deleteMessageMe =async(messageId,conversationId)=> {
+  await api.post("/deleteMessageMe",{messageId,conversationId});
+  // return res.data;
+}
+
+export const deleteMessage= async(messageId,conversationId)=> {
+  await api.post("/deleteMessage",{messageId,conversationId});
 }
 
 export const fetchBroadcast = async () => {
