@@ -18,6 +18,7 @@ import {
   sendMessage,
   fetchConversationMeta,
   fetchUserById,
+  deleteChat,
 } from "../Tanstack/Chatlist";
 import bg from "../../utils/background.jpg";
 import EditProfileModal from "../EditProfile/editProfile";
@@ -117,11 +118,6 @@ const ChatDashboard = () => {
     };
   }, [socket, conversationId, currentUser, queryClient]);
 
-  useEffect(() => {
-    if (!currentUser) {
-      navigate("/", { replace: true });
-    }
-  }, [currentUser, navigate]);
 
   const sendMessageMutation = useMutation({
     mutationFn: sendMessage,
@@ -210,9 +206,9 @@ const ChatDashboard = () => {
                   alt={receiver.name || "User"}
                   className="w-full h-full object-cover rounded-full"
                 />
-              ) : receiver?.name?.trim()?.charAt(0)?.toUpperCase() ? (
-                <div className="w-full h-full rounded-full bg-gray-300 text-black flex items-center justify-center font-bold">
-                  {receiver?.name?.trim()?.charAt(0)?.toUpperCase()}
+              ) : receiver?.user_name?.trim()?.charAt(0)?.toUpperCase() ? (
+                <div className="w-full h-full rounded-full flex items-center justify-center font-bold">
+                  {receiver?.user_name?.trim()?.charAt(0)?.toUpperCase()}
                 </div>
               ) : (
                 <span className="font-semibold text-sm text-black">📢</span>
@@ -466,7 +462,7 @@ const ChatDashboard = () => {
                             "Are you sure you want to delete this conversation?",
                           )
                         ) {
-                          // Implement delete logic
+                          deleteChat(conversationId);
                           setShowDropdown(false);
                         }
                       }}

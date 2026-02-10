@@ -2,10 +2,10 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const onlineSlice = createSlice({
   name: "online",
-  initialState: [], // 👈 ARRAY, not Set
+  initialState: [],
   reducers: {
     setAll: (_, action) => {
-      return action.payload; // payload = [1, 2, 3]
+      return action.payload;
     },
     update: (state, action) => {
       const { userId, status } = action.payload;

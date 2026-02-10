@@ -57,6 +57,11 @@ export const getGroup = async (payload) => {
   return res.data;
 };
 
+export const deleteChat = async(conversationId) => {
+  const res=await api.post("deleteChat",conversationId);
+  return res.data;
+}
+
 export const fetchBroadcast = async () => {
   const res = await api.get("/boardcastList");
   return res.data;
