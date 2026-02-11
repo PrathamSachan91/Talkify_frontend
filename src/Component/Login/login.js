@@ -135,10 +135,9 @@ function Login() {
         </div>
 
         {/* Alert */}
-        {alert.msg && (
-          <div
-            className={`mb-2 text-sm px-4 py-3 rounded-lg text-center flex items-center justify-center gap-2 animate-slideIn`}
-            style={{
+        {alert.msg && <div
+          className="absolute top-4 right-4 px-4 py-2 rounded-lg flex items-center gap-2 animate-slide-in shadow-lg z-50"
+          style={{
               backgroundColor:
                 alert.type === "success"
                   ? "rgba(34,197,94,0.15)"
@@ -146,18 +145,21 @@ function Login() {
               color:
                 alert.type === "success" ? "var(--success)" : "var(--danger)",
               border: `1px solid ${
-                alert.type === "success" ? "rgba(34,197,94,0.3)" : "rgba(239,68,68,0.3)"
+                alert.type === "success"
+                  ? "rgba(34,197,94,0.3)"
+                  : "rgba(239,68,68,0.3)"
               }`,
             }}
-          >
-            {alert.type === "success" ? (
+        >
+          {alert.type === "success" ? (
               <CheckCircle className="w-4 h-4" />
             ) : (
               <XCircle className="w-4 h-4" />
             )}
+          <span className="text-sm font-semibold">
             {alert.msg}
-          </div>
-        )}
+          </span>
+        </div>}
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-5">
