@@ -15,6 +15,7 @@ import {
   ChevronDown,
   Search,
   XCircle,
+  Smile,
 } from "lucide-react";
 import {
   fetchMessages,
@@ -27,6 +28,7 @@ import {
 } from "../Tanstack/Chatlist";
 import bg from "../../utils/background.jpg";
 import EditProfileModal from "../EditProfile/editProfile";
+import EmojiPicker from "emoji-picker-react";
 
 const ChatDashboard = () => {
   const { conversationId } = useParams();
@@ -52,6 +54,9 @@ const ChatDashboard = () => {
   const [dropdownPosition, setDropdownPosition] = useState("bottom");
   const [search, setSearch] = useState("");
   const [displaySearch, setDisplaySearch] = useState(false);
+  const [emoji, setEmojis] = useState(false);
+  const emojiRef = useRef(null);
+
   const [deleteModal, setDeleteModal] = useState({
     show: false,
     type: "", // 'conversation', 'message', 'message-for-me'
@@ -258,13 +263,26 @@ const ChatDashboard = () => {
 
     setMessageDropdown(messageDropdown === msgId ? null : msgId);
   };
-  
-  const filteredMessages = search.trim()
-  ? messages.filter((msg) =>
-      msg.text?.toLowerCase().includes(search.toLowerCase())
-    )
-  : messages;
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (emojiRef.current && !emojiRef.current.contains(event.target)) {
+        setEmojis(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  const filteredMessages = search.trim()
+    ? messages.filter((msg) =>
+        msg.text?.toLowerCase().includes(search.toLowerCase()),
+      )
+    : messages;
 
   if (isLoading) {
     return (
@@ -1103,23 +1121,19 @@ const ChatDashboard = () => {
             }}
           />
 
-          {/* Attachment Button */}
-          <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            className="attachment-button p-3 rounded-xl transition-all flex-shrink-0"
-            style={{
-              backgroundColor: "var(--bg-input)",
-              color: "var(--text-muted)",
-              border: "1px solid var(--border-input)",
-            }}
-            title="Attach image"
-          >
-            <Paperclip size={20} />
-          </button>
-
-          {/* Text Input Container */}
+          {/* Input wrapper */}
           <div className="flex-1 relative">
+            {/* 📎 Attachment icon (LEFT) */}
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="absolute left-3 top-1/2 -translate-y-1/2 p-1 rounded-lg"
+              style={{ color: "var(--text-muted)" }}
+            >
+              <Paperclip size={18} />
+            </button>
+
+            {/* Input */}
             <input
               ref={inputRef}
               value={text}
@@ -1128,7 +1142,7 @@ const ChatDashboard = () => {
                 handleTyping();
               }}
               placeholder="Type a message..."
-              className="w-full px-5 py-3.5 rounded-xl outline-none transition-all text-[15px]"
+              className="w-full pl-11 pr-11 py-3.5 rounded-xl outline-none transition-all text-[15px]"
               style={{
                 backgroundColor: "var(--bg-input)",
                 color: "var(--text-main)",
@@ -1144,6 +1158,34 @@ const ChatDashboard = () => {
                 e.target.style.boxShadow = "none";
               }}
             />
+
+            <div ref={emojiRef}>
+              <button
+                type="button"
+                onClick={() => setEmojis((prev) => !prev)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-lg"
+                style={{ color: "var(--text-muted)" }}
+              >
+                <Smile size={18} />
+              </button>
+
+              {emoji && (
+                <div className="absolute bottom-14 right-0 z-50">
+                  <EmojiPicker
+                    theme="dark"
+                    onEmojiClick={(emojiData) => {
+                      setText((prev) => prev + emojiData.emoji);
+                      inputRef.current?.focus();
+                    }}
+                    style={{
+                      opacity: 0.8,
+                      background: "var(--bg-card)",
+                      color: "white",
+                    }}
+                  />
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Send Button */}
