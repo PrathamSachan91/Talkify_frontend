@@ -13,6 +13,8 @@ import {
   Phone,
   Video,
   ChevronDown,
+  Search,
+  XCircle,
 } from "lucide-react";
 import {
   fetchMessages,
@@ -48,6 +50,8 @@ const ChatDashboard = () => {
   const [messageDropdown, setMessageDropdown] = useState(null);
   const messageDropdownRef = useRef(null);
   const [dropdownPosition, setDropdownPosition] = useState("bottom");
+  const [search, setSearch] = useState("");
+  const [displaySearch, setDisplaySearch] = useState(false);
   const [deleteModal, setDeleteModal] = useState({
     show: false,
     type: "", // 'conversation', 'message', 'message-for-me'
@@ -229,9 +233,9 @@ const ChatDashboard = () => {
     if (deleteModal.type === "conversation") {
       deleteChat(deleteModal.id);
     } else if (deleteModal.type === "message") {
-      deleteMessage(deleteModal.id,conversationId);
+      deleteMessage(deleteModal.id, conversationId);
     } else if (deleteModal.type === "message-for-me") {
-      deleteMessageMe(deleteModal.id,conversationId);
+      deleteMessageMe(deleteModal.id, conversationId);
     }
     setDeleteModal({ show: false, type: "", id: null });
   };
@@ -254,6 +258,13 @@ const ChatDashboard = () => {
 
     setMessageDropdown(messageDropdown === msgId ? null : msgId);
   };
+  
+  const filteredMessages = search.trim()
+  ? messages.filter((msg) =>
+      msg.text?.toLowerCase().includes(search.toLowerCase())
+    )
+  : messages;
+
 
   if (isLoading) {
     return (
@@ -364,6 +375,53 @@ const ChatDashboard = () => {
         </div>
 
         <div className="flex items-center gap-2">
+          {displaySearch && (
+            <div className="relative">
+              <input
+                placeholder="Search chat..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="px-5 py-2 pr-11 rounded-xl outline-none transition-all text-[15px]"
+                style={{
+                  backgroundColor: "var(--bg-input)",
+                  color: "var(--text-main)",
+                  border: "1px solid var(--border-input)",
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = "var(--border-focus)";
+                  e.target.style.boxShadow =
+                    "0 0 0 3px rgba(45, 212, 191, 0.1), var(--shadow-glow)";
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = "var(--border-input)";
+                  e.target.style.boxShadow = "none";
+                }}
+              />
+
+              {/* Cross icon inside input */}
+              <button
+                type="button"
+                className="absolute right-3 top-1/3 icon-button"
+                style={{ color: "var(--text-muted)" }}
+                onClick={() => {
+                  setSearch("");
+                  setDisplaySearch(false);
+                }}
+              >
+                <XCircle size={16} />
+              </button>
+            </div>
+          )}
+
+          {!displaySearch && (
+            <button
+              className="icon-button p-2 rounded-lg transition-all"
+              style={{ color: "var(--text-muted)" }}
+              onClick={() => setDisplaySearch(true)}
+            >
+              <Search size={18} />
+            </button>
+          )}
           <button
             className="icon-button p-2 rounded-lg transition-all"
             style={{
@@ -480,38 +538,6 @@ const ChatDashboard = () => {
                       )}
 
                     {/* Search Messages Button */}
-                    <button
-                      className="w-full px-4 py-2.5 flex items-center gap-3 transition-colors duration-150"
-                      style={{ color: "var(--text-main)" }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor =
-                          "rgba(20, 184, 166, 0.1)";
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = "transparent";
-                      }}
-                      onClick={() => {
-                        // Implement search
-                        setShowDropdown(false);
-                      }}
-                    >
-                      <svg
-                        className="w-5 h-5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                        />
-                      </svg>
-                      <span className="text-sm font-medium">
-                        Search Messages
-                      </span>
-                    </button>
 
                     {/* Mute Notifications */}
                     <button
@@ -635,7 +661,7 @@ const ChatDashboard = () => {
           backgroundAttachment: "fixed",
         }}
       >
-        {messages.length === 0 ? (
+        {filteredMessages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full gap-4 opacity-60">
             <div
               className="w-20 h-20 rounded-full flex items-center justify-center"
@@ -656,7 +682,7 @@ const ChatDashboard = () => {
             </p>
           </div>
         ) : (
-          messages.map((msg, index) => {
+          filteredMessages.map((msg, index) => {
             const isMe = msg.sender_id === currentUser?.auth_id;
             const showAvatar =
               !isMe &&
