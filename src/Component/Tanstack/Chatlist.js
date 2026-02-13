@@ -94,3 +94,8 @@ export const editGroup = async ({ group_name, group_image,conversation_id }) => 
 
   return res.data;
 };
+
+export const fetchConversation = async() => {
+  const response =api.get("/lastMessage");
+  return (await response).data;
+}

@@ -6,11 +6,13 @@ import {
   fetchGroups,
   fetchBroadcast,
   getGroup,
+  fetchConversation,
 } from "../Tanstack/Chatlist";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSocket } from "../../socket/socketContext";
 import CreateGroupModal from "./groupModal";
+import { CheckCheck } from "lucide-react";
 
 const SideBar = () => {
   const currentUser = useSelector((state) => state.auth.user);
@@ -39,6 +41,11 @@ const SideBar = () => {
   const { data: broadcast } = useQuery({
     queryKey: ["broadcast"],
     queryFn: fetchBroadcast,
+  });
+
+  const { data: conversations = [] } = useQuery({
+    queryKey: ["conversations"],
+    queryFn: fetchConversation,
   });
 
   /* ---------------- OPEN PRIVATE CHAT ---------------- */
@@ -91,6 +98,102 @@ const SideBar = () => {
     };
   }, [socket, queryClient]);
 
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleLastMessage = (data) => {
+      queryClient.setQueryData(["conversations"], (old = []) => {
+        if (!old || old.length === 0) return old;
+        const targetId = Number(data.conversationId);
+        const updated = old.map((conv) =>
+          conv.conversation_id === targetId
+            ? {
+                ...conv,
+                last_message: data.text,
+                updatedAt: data.updatedAt,
+              }
+            : conv,
+        );
+
+        return updated.sort(
+          (a, b) => new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0),
+        );
+      });
+    };
+
+    socket.on("last_message", handleLastMessage);
+
+    return () => socket.off("last_message", handleLastMessage);
+  }, [socket, queryClient]);
+
+  // Memoize filtered users
+  const filteredUsers = useMemo(
+    () =>
+      users
+        .filter((u) => u.auth_id !== currentUser?.auth_id)
+        .filter((u) =>
+          u.user_name.toLowerCase().includes(search.toLowerCase()),
+        ),
+    [users, currentUser, search],
+  );
+
+  // Memoize filtered groups
+  const filteredGroups = useMemo(
+    () =>
+      groups.filter((g) =>
+        g.group_name.toLowerCase().includes(search.toLowerCase()),
+      ),
+    [groups, search],
+  );
+
+  const {
+    conversationById,
+    privateConversationByUser,
+    orderedUsers,
+    orderedGroups,
+  } = useMemo(() => {
+    const sortedConversations = [...conversations].sort(
+      (a, b) => new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0),
+    );
+
+    const convById = new Map();
+    const privateByUser = new Map();
+
+    sortedConversations.forEach((conv) => {
+      convById.set(conv.conversation_id, conv);
+
+      if (conv.type === "private") {
+        const otherUser =
+          conv.user1_id === currentUser?.auth_id
+            ? conv.user2_id
+            : conv.user1_id;
+
+        privateByUser.set(otherUser, conv);
+      }
+    });
+
+    const orderedUsers = [...filteredUsers].sort((a, b) => {
+      const convA = privateByUser.get(a.auth_id);
+      const convB = privateByUser.get(b.auth_id);
+      return new Date(convB?.updatedAt || 0) - new Date(convA?.updatedAt || 0);
+    });
+
+    const orderedGroups = [...filteredGroups].sort((a, b) => {
+      const convA = convById.get(a.conversation_id);
+      const convB = convById.get(b.conversation_id);
+      return new Date(convB?.updatedAt || 0) - new Date(convA?.updatedAt || 0);
+    });
+
+    return {
+      conversationById: convById,
+      privateConversationByUser: privateByUser,
+      orderedUsers,
+      orderedGroups,
+    };
+  }, [conversations, filteredUsers, filteredGroups, currentUser]);
+
+  if (!isLoggedIn) return null;
+
   if (isLoading) {
     return (
       <aside className="w-64 h-full flex items-center justify-center">
@@ -103,17 +206,7 @@ const SideBar = () => {
       </aside>
     );
   }
-  const filterCurrent = users.filter((u) => u.auth_id !== currentUser?.auth_id);
 
-  const filteredUsers = filterCurrent.filter((u) =>
-    u.user_name.toLowerCase().includes(search.toLowerCase()),
-  );
-  
-  const filteredGroups = groups.filter((g) =>
-    g.group_name.toLowerCase().includes(search.toLowerCase()),
-  );
-
-  if (!isLoggedIn) return null;
   return (
     <aside
       className="sm:flex sm:w-64 lg:w-72 xl:w-80 h-full flex-col shadow-lg"
@@ -141,7 +234,8 @@ const SideBar = () => {
           className="text-xs opacity-60 mt-1"
           style={{ color: "var(--text-main)" }}
         >
-          {filteredUsers.length + groups.length + (broadcast ? 1 : 0)} total
+          {filteredUsers.length + filteredGroups.length + (broadcast ? 1 : 0)}{" "}
+          total
         </p>
       </div>
 
@@ -177,6 +271,7 @@ const SideBar = () => {
           Create New Group
         </button>
       </div>
+
       <input
         placeholder="Search chat..."
         value={search}
@@ -209,7 +304,7 @@ const SideBar = () => {
       {/* List */}
       <div className="overflow-y-auto flex-1 px-2 pb-2">
         {/* GROUPS */}
-        {groups.length > 0 && (
+        {orderedGroups.length > 0 && (
           <div className="mb-3">
             <div className="px-3 py-2 flex items-center gap-2">
               <svg
@@ -238,52 +333,58 @@ const SideBar = () => {
                   color: "var(--accent-primary)",
                 }}
               >
-                {groups.length}
+                {orderedGroups.length}
               </span>
             </div>
 
-            {filteredGroups.map((group) => (
-              <div
-                key={`group-${group.conversation_id}`}
-                className="px-3 py-2.5 mb-1 flex items-center gap-3 cursor-pointer transition-all duration-200 rounded-lg"
-                style={{ color: "var(--text-main)" }}
-                onClick={() => navigate(`/chat/${group.conversation_id}`)}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor =
-                    "rgba(20, 184, 166, 0.12)";
-                  e.currentTarget.style.transform = "translateX(4px)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = "transparent";
-                  e.currentTarget.style.transform = "translateX(0)";
-                }}
-              >
+            {orderedGroups.map((group) => {
+              const conv = conversationById.get(group.conversation_id);
+
+              return (
                 <div
-                  className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-base shadow-sm"
-                  style={{
-                    backgroundColor: "var(--accent-primary)",
-                    color: "#020617",
+                  key={`group-${group.conversation_id}`}
+                  className="px-3 py-2.5 mb-1 flex items-center gap-3 cursor-pointer transition-all duration-200 rounded-lg"
+                  style={{ color: "var(--text-main)" }}
+                  onClick={() => navigate(`/chat/${group.conversation_id}`)}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor =
+                      "rgba(20, 184, 166, 0.12)";
+                    e.currentTarget.style.transform = "translateX(4px)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = "transparent";
+                    e.currentTarget.style.transform = "translateX(0)";
                   }}
                 >
-                  {group.group_image ? (
-                    <img
-                      src={group.group_image}
-                      alt={group.group_name}
-                      className="w-full h-full object-cover rounded-full"
-                    />
-                  ) : (
-                    <span>{group.group_name?.charAt(0).toUpperCase()}</span>
-                  )}
-                </div>
+                  <div
+                    className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-base shadow-sm"
+                    style={{
+                      backgroundColor: "var(--accent-primary)",
+                      color: "#020617",
+                    }}
+                  >
+                    {group.group_image ? (
+                      <img
+                        src={group.group_image}
+                        alt={group.group_name}
+                        className="w-full h-full object-cover rounded-full"
+                      />
+                    ) : (
+                      <span>{group.group_name?.charAt(0).toUpperCase()}</span>
+                    )}
+                  </div>
 
-                <div className="flex-1 min-w-0">
-                  <span className="text-sm font-medium block truncate">
-                    {group.group_name}
-                  </span>
-                  <span className="text-xs opacity-50">Group chat</span>
+                  <div className="flex-1 min-w-0">
+                    <span className="text-sm font-medium block truncate">
+                      {group.group_name}
+                    </span>
+                    <span className="text-xs opacity-50 truncate block">
+                      {conv?.last_message || "No messages yet"}
+                    </span>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
 
@@ -312,38 +413,46 @@ const SideBar = () => {
               </span>
             </div>
 
-            <div
-              key={`broadcast-${broadcast.conversation_id}`}
-              className="px-3 py-2.5 mb-1 flex items-center gap-3 cursor-pointer transition-all duration-200 rounded-lg"
-              style={{ color: "var(--text-main)" }}
-              onClick={() => navigate(`/chat/${broadcast.conversation_id}`)}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor =
-                  "rgba(20, 184, 166, 0.12)";
-                e.currentTarget.style.transform = "translateX(4px)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = "transparent";
-                e.currentTarget.style.transform = "translateX(0)";
-              }}
-            >
-              <div
-                className="w-10 h-10 rounded-full flex items-center justify-center text-xl shadow-sm"
-                style={{
-                  backgroundColor: "var(--accent-primary)",
-                  color: "#020617",
-                }}
-              >
-                📢
-              </div>
+            {(() => {
+              const conv = conversationById.get(broadcast.conversation_id);
 
-              <div className="flex-1 min-w-0">
-                <span className="text-sm font-medium block truncate">
-                  {broadcast.group_name}
-                </span>
-                <span className="text-xs opacity-50">Public channel</span>
-              </div>
-            </div>
+              return (
+                <div
+                  key={`broadcast-${broadcast.conversation_id}`}
+                  className="px-3 py-2.5 mb-1 flex items-center gap-3 cursor-pointer transition-all duration-200 rounded-lg"
+                  style={{ color: "var(--text-main)" }}
+                  onClick={() => navigate(`/chat/${broadcast.conversation_id}`)}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor =
+                      "rgba(20, 184, 166, 0.12)";
+                    e.currentTarget.style.transform = "translateX(4px)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = "transparent";
+                    e.currentTarget.style.transform = "translateX(0)";
+                  }}
+                >
+                  <div
+                    className="w-10 h-10 rounded-full flex items-center justify-center text-xl shadow-sm"
+                    style={{
+                      backgroundColor: "var(--accent-primary)",
+                      color: "#020617",
+                    }}
+                  >
+                    📢
+                  </div>
+
+                  <div className="flex-1 min-w-0">
+                    <span className="text-sm font-medium block truncate">
+                      {broadcast.group_name}
+                    </span>
+                    <span className="text-xs opacity-50 truncate block">
+                      {conv?.last_message || "No messages yet"}
+                    </span>
+                  </div>
+                </div>
+              );
+            })()}
           </div>
         )}
 
@@ -376,12 +485,13 @@ const SideBar = () => {
                 color: "var(--accent-secondary)",
               }}
             >
-              {filteredUsers.length}
+              {orderedUsers.length}
             </span>
           </div>
 
-          {filteredUsers.map((user) => {
+          {orderedUsers.map((user) => {
             const isOnline = online.has(user?.auth_id);
+            const conv = privateConversationByUser.get(user.auth_id);
 
             return (
               <div
@@ -443,9 +553,19 @@ const SideBar = () => {
                   <span className="text-sm font-medium block truncate">
                     {user.user_name}
                   </span>
-                  <span className="text-xs opacity-50">
-                    {isOnline ? "Online" : "Offline"}
-                  </span>
+
+                  <div className="flex items-center gap-1">
+                    {conv?.last_sender === currentUser?.auth_id && (
+                      <CheckCheck
+                        size={14}
+                        className="opacity-70 flex-shrink-0"
+                        style={{ color: "var(--text-muted)" }}
+                      />
+                    )}
+                    <span className="text-xs opacity-50 truncate">
+                      {conv?.last_message || "No messages yet"}
+                    </span>
+                  </div>
                 </div>
               </div>
             );
