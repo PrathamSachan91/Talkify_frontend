@@ -292,10 +292,11 @@ const ChatDashboard = () => {
       >
         <div className="flex flex-col items-center gap-3">
           <div className="typing-loader">
-            <span></span>
-            <span></span>
-            <span></span>
+            {[0, 1, 2].map((i) => (
+              <span key={i}></span>
+            ))}
           </div>
+
           <span style={{ color: "var(--text-muted)" }}>Loading chat…</span>
         </div>
       </div>
@@ -379,9 +380,9 @@ const ChatDashboard = () => {
                 (isTyping ? (
                   <span className="flex items-center gap-1">
                     <span className="typing-dots">
-                      <span></span>
-                      <span></span>
-                      <span></span>
+                      {[0, 1, 2].map((i) => (
+                        <span key={i}></span>
+                      ))}
                     </span>
                     typing...
                   </span>
@@ -705,12 +706,12 @@ const ChatDashboard = () => {
             const showAvatar =
               !isMe &&
               showSenderName &&
-              (index === messages.length - 1 ||
-                messages[index + 1]?.sender_id !== msg.sender_id);
+              (index === filteredMessages.length - 1 ||
+                filteredMessages[index + 1]?.sender_id !== msg.sender_id);
 
             return (
               <div
-                key={msg.id}
+                key={`message-${msg.id}-${index}`}
                 className={`message-wrapper flex items-end gap-2 ${isMe ? "flex-row-reverse" : "flex-row"} group`}
                 style={{
                   animation: "messageSlideIn 0.3s ease-out",
@@ -810,10 +811,12 @@ const ChatDashboard = () => {
                             color: isMe ? "#020617" : "var(--text-muted)",
                           }}
                         >
-                          {new Date(msg.createdAt).toLocaleTimeString("en-US", {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })}
+                          {msg.createdAt && !isNaN(new Date(msg.createdAt).getTime())
+                            ? new Date(msg.createdAt).toLocaleTimeString("en-US", {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })
+                            : ""}
                         </span>
                         {isMe && (
                           <CheckCheck
@@ -1017,9 +1020,9 @@ const ChatDashboard = () => {
               }}
             >
               <div className="typing-indicator">
-                <span></span>
-                <span></span>
-                <span></span>
+                {[0, 1, 2].map((i) => (
+                  <span key={i}></span>
+                ))}
               </div>
             </div>
           </div>
@@ -1039,7 +1042,7 @@ const ChatDashboard = () => {
         >
           {previews.map((src, idx) => (
             <div
-              key={idx}
+              key={`preview-${idx}-${Date.now()}`}
               className="relative group image-preview-item"
               style={{
                 animation: "fadeIn 0.2s ease-in",
@@ -1047,7 +1050,7 @@ const ChatDashboard = () => {
             >
               <img
                 src={src}
-                alt="preview"
+                alt={`preview ${idx + 1}`}
                 className="w-20 h-20 object-cover rounded-xl border-2 shadow-md"
                 style={{
                   borderColor: "var(--border-focus)",
