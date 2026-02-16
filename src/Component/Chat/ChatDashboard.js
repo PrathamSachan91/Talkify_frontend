@@ -122,6 +122,8 @@ const ChatDashboard = () => {
     queryKey: ["messages", conversationId],
     queryFn: () => fetchMessages(conversationId),
     enabled: !!conversationId,
+    refetchOnMount:'always',
+    staleTime: 0,
   });
 
   useEffect(() => {
