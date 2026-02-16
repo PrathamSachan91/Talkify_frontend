@@ -120,7 +120,6 @@ const SideBar = () => {
         );
       });
     };
-
     socket.on("last_message", handleLastMessage);
 
     return () => socket.off("last_message", handleLastMessage);
