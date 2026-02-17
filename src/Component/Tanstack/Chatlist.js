@@ -93,7 +93,6 @@ export const editGroup = async ({
   const res = await api.post("/editGroup", formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
-
   return res.data;
 };
 

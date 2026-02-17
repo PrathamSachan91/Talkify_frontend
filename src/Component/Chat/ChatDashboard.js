@@ -16,6 +16,8 @@ import {
   Search,
   XCircle,
   Smile,
+  Forward,
+  Reply,
 } from "lucide-react";
 import {
   fetchMessages,
@@ -26,10 +28,14 @@ import {
   deleteMessage,
   deleteMessageMe,
   markRead,
+  fetchGroups,
+  fetchUsers,
+  fetchConversation,
 } from "../Tanstack/Chatlist";
 import bg from "../../utils/background.jpg";
 import EditProfileModal from "../EditProfile/editProfile";
 import EmojiPicker from "emoji-picker-react";
+import ForwardMessageModal from "./forwardMessageModal";
 
 const ChatDashboard = () => {
   const { conversationId } = useParams();
@@ -57,6 +63,10 @@ const ChatDashboard = () => {
   const [displaySearch, setDisplaySearch] = useState(false);
   const [emoji, setEmojis] = useState(false);
   const emojiRef = useRef(null);
+  const [forwardModal, setForwardModal] = useState({
+    show: false,
+    message: null,
+  });
 
   const [deleteModal, setDeleteModal] = useState({
     show: false,
@@ -118,6 +128,20 @@ const ChatDashboard = () => {
     queryFn: () => fetchUserById(convo.receiver_id),
     enabled: convo?.type === "private" && !!convo?.receiver_id,
   });
+  const { data: allGroups = [] } = useQuery({
+    queryKey: ["groups"],
+    queryFn: fetchGroups,
+  });
+  
+  const { data: allUsers = [] } = useQuery({
+    queryKey: ["users"],
+    queryFn: fetchUsers,
+  });
+
+  const { data: allConversations = [] } = useQuery({
+    queryKey: ["conversations"],
+    queryFn: fetchConversation,
+  });
 
   const { data: messages = [], isLoading } = useQuery({
     queryKey: ["messages", conversationId],
@@ -147,7 +171,7 @@ const ChatDashboard = () => {
         lastMessageId: lastMessage.id,
       });
     }
-  }, [messages, conversationId, currentUser?.auth_id,markAsRead]);
+  }, [messages, conversationId, currentUser?.auth_id, markAsRead]);
 
   useEffect(() => {
     if (!socket || !conversationId) return;
@@ -309,6 +333,31 @@ const ChatDashboard = () => {
         msg.text?.toLowerCase().includes(search.toLowerCase()),
       )
     : messages;
+
+  const urlToFile = async (url) => {
+    const res = await fetch(url);
+    const blob = await res.blob();
+    const filename = url.split("/").pop().split("?")[0] || "image.jpg";
+    return new File([blob], filename, { type: blob.type });
+  };
+
+  const handleForward = async (targetIds, message) => {
+    const imageFiles = await Promise.all(
+      (message.images || []).map((url) => urlToFile(url)),
+    );
+
+    await Promise.all(
+      targetIds.map((id) =>
+        sendMessageMutation.mutateAsync({
+          conversationId: id,
+          text: message.text || "",
+          images: imageFiles,
+        }),
+      ),
+    );
+
+    queryClient.invalidateQueries({ queryKey: ["messages"] });
+  };
 
   if (isLoading) {
     return (
@@ -910,21 +959,31 @@ const ChatDashboard = () => {
                                 }}
                                 onClick={() => handleReply(msg)}
                               >
-                                <svg
-                                  className="w-4 h-4"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"
-                                  />
-                                </svg>
+                                <Reply></Reply>
                                 <span className="text-sm font-medium">
                                   Reply
+                                </span>
+                              </button>
+
+                              <button
+                                className="w-full px-4 py-2.5 flex items-center gap-3 transition-colors duration-150"
+                                style={{ color: "var(--text-main)" }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.backgroundColor =
+                                    "rgba(20, 184, 166, 0.1)";
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.backgroundColor =
+                                    "transparent";
+                                }}
+                                onClick={() => {
+                                  setForwardModal({ show: true, message: msg });
+                                  setMessageDropdown(null);
+                                }}
+                              >
+                                <Forward></Forward>
+                                <span className="text-sm font-medium">
+                                  Forward
                                 </span>
                               </button>
 
@@ -1118,6 +1177,16 @@ const ChatDashboard = () => {
         mode="group"
         group={convo}
         conversationId={conversationId}
+      />
+      <ForwardMessageModal
+        isOpen={forwardModal.show}
+        onClose={() => setForwardModal({ show: false, message: null })}
+        message={forwardModal.message}
+        conversations={allConversations}
+        groups={allGroups}
+        users={allUsers}
+        currentUser={currentUser}
+        onForward={handleForward}
       />
 
       {/* ================= ENHANCED INPUT ================= */}

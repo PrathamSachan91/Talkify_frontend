@@ -99,7 +99,6 @@ const SideBar = () => {
     };
   }, [socket, queryClient]);
 
-  // hard Connect
   useEffect(() => {
     if (!socket || !conversations.length) return;
 
