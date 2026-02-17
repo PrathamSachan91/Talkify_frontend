@@ -99,6 +99,22 @@ const SideBar = () => {
     };
   }, [socket, queryClient]);
 
+  // hard Connect
+  useEffect(() => {
+    if (!socket || !conversations.length) return;
+
+    const joinAll = () => {
+      conversations.forEach((c) => {
+        socket.emit("join_conversation", c.conversation_id);
+      });
+    };
+
+    joinAll();
+    socket.on("connect", joinAll);
+
+    return () => socket.off("connect", joinAll);
+  }, [socket, conversations]);
+
   /* ---------------- SOCKET: LAST MESSAGE & UNREAD ---------------- */
   useEffect(() => {
     if (!socket) return;
