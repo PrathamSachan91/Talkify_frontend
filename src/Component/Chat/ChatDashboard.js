@@ -18,6 +18,7 @@ import {
   Smile,
   Forward,
   Reply,
+  Edit2Icon,
 } from "lucide-react";
 import {
   fetchMessages,
@@ -132,7 +133,7 @@ const ChatDashboard = () => {
     queryKey: ["groups"],
     queryFn: fetchGroups,
   });
-  
+
   const { data: allUsers = [] } = useQuery({
     queryKey: ["users"],
     queryFn: fetchUsers,
@@ -947,7 +948,7 @@ const ChatDashboard = () => {
                             <div className="py-1">
                               {/* Reply */}
                               <button
-                                className="w-full px-4 py-2.5 flex items-center gap-3 transition-colors duration-150"
+                                className="w-full px-4 py-1 flex items-center gap-3 transition-colors duration-150"
                                 style={{ color: "var(--text-main)" }}
                                 onMouseEnter={(e) => {
                                   e.currentTarget.style.backgroundColor =
@@ -959,14 +960,14 @@ const ChatDashboard = () => {
                                 }}
                                 onClick={() => handleReply(msg)}
                               >
-                                <Reply></Reply>
+                                <Reply className="w-4 h-4"></Reply>
                                 <span className="text-sm font-medium">
                                   Reply
                                 </span>
                               </button>
 
                               <button
-                                className="w-full px-4 py-2.5 flex items-center gap-3 transition-colors duration-150"
+                                className="w-full px-4 py-1 flex items-center gap-3 transition-colors duration-150"
                                 style={{ color: "var(--text-main)" }}
                                 onMouseEnter={(e) => {
                                   e.currentTarget.style.backgroundColor =
@@ -981,9 +982,30 @@ const ChatDashboard = () => {
                                   setMessageDropdown(null);
                                 }}
                               >
-                                <Forward></Forward>
+                                <Forward className="w-4 h-4"></Forward>
                                 <span className="text-sm font-medium">
                                   Forward
+                                </span>
+                              </button>
+                              <button
+                                className="w-full px-4 py-1 flex items-center gap-3 transition-colors duration-150"
+                                style={{ color: "var(--text-main)" }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.backgroundColor =
+                                    "rgba(20, 184, 166, 0.1)";
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.backgroundColor =
+                                    "transparent";
+                                }}
+                                onClick={() => {
+                                  setForwardModal({ show: true, message: msg });
+                                  setMessageDropdown(null);
+                                }}
+                              >
+                                <Edit2Icon className="w-4 h-4"></Edit2Icon>
+                                <span className="text-sm font-medium">
+                                  Edit Message
                                 </span>
                               </button>
 
@@ -999,7 +1021,7 @@ const ChatDashboard = () => {
 
                                   return (
                                     <button
-                                      className="w-full px-4 py-2.5 flex items-center gap-3 transition-colors duration-150"
+                                      className="w-full px-4 py-1 flex items-center gap-3 transition-colors duration-150"
                                       style={{
                                         color: canDeleteForEveryone
                                           ? "var(--danger)"
@@ -1047,7 +1069,7 @@ const ChatDashboard = () => {
 
                               {/* Delete For Me */}
                               <button
-                                className="w-full px-4 py-2.5 flex items-center gap-3 transition-colors duration-150"
+                                className="w-full px-4 py-1 flex items-center gap-3 transition-colors duration-150"
                                 style={{ color: "var(--text-main)" }}
                                 onMouseEnter={(e) => {
                                   e.currentTarget.style.backgroundColor =
