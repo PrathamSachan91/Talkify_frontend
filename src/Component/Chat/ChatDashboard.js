@@ -19,6 +19,8 @@ import {
   Forward,
   Reply,
   Edit2Icon,
+  Edit,
+  Edit3Icon,
 } from "lucide-react";
 import {
   fetchMessages,
@@ -32,6 +34,7 @@ import {
   fetchGroups,
   fetchUsers,
   fetchConversation,
+  editMessage,
 } from "../Tanstack/Chatlist";
 import bg from "../../utils/background.jpg";
 import EditProfileModal from "../EditProfile/editProfile";
@@ -68,6 +71,7 @@ const ChatDashboard = () => {
     show: false,
     message: null,
   });
+  const [editingMessage, setEditingMessage] = useState(null);
 
   const [deleteModal, setDeleteModal] = useState({
     show: false,
@@ -158,6 +162,14 @@ const ChatDashboard = () => {
 
     onError: (error) => {
       console.error("Failed to mark as read:", error);
+    },
+  });
+
+  const editMessageMutation = useMutation({
+    mutationFn: editMessage,
+    onSuccess: () => {
+      setEditingMessage(null);
+      queryClient.invalidateQueries({ queryKey: ["messages", conversationId] });
     },
   });
 
@@ -987,27 +999,6 @@ const ChatDashboard = () => {
                                   Forward
                                 </span>
                               </button>
-                              <button
-                                className="w-full px-4 py-1 flex items-center gap-3 transition-colors duration-150"
-                                style={{ color: "var(--text-main)" }}
-                                onMouseEnter={(e) => {
-                                  e.currentTarget.style.backgroundColor =
-                                    "rgba(20, 184, 166, 0.1)";
-                                }}
-                                onMouseLeave={(e) => {
-                                  e.currentTarget.style.backgroundColor =
-                                    "transparent";
-                                }}
-                                onClick={() => {
-                                  setForwardModal({ show: true, message: msg });
-                                  setMessageDropdown(null);
-                                }}
-                              >
-                                <Edit2Icon className="w-4 h-4"></Edit2Icon>
-                                <span className="text-sm font-medium">
-                                  Edit Message
-                                </span>
-                              </button>
 
                               {/* Delete Message (only if user is sender and within 10 minutes) */}
                               {isMe &&
@@ -1020,50 +1011,91 @@ const ChatDashboard = () => {
                                     diffInMinutes <= 10;
 
                                   return (
-                                    <button
-                                      className="w-full px-4 py-1 flex items-center gap-3 transition-colors duration-150"
-                                      style={{
-                                        color: canDeleteForEveryone
-                                          ? "var(--danger)"
-                                          : "var(--text-muted)",
-                                        opacity: canDeleteForEveryone ? 1 : 0.5,
-                                      }}
-                                      onMouseEnter={(e) => {
-                                        if (canDeleteForEveryone) {
+                                    <>
+                                      <button
+                                        className="w-full px-4 py-1 flex items-center gap-3 transition-colors duration-150"
+                                        style={{
+                                          color: canDeleteForEveryone
+                                            ? "var(--danger)"
+                                            : "var(--text-muted)",
+                                          opacity: canDeleteForEveryone
+                                            ? 1
+                                            : 0.5,
+                                        }}
+                                        onMouseEnter={(e) => {
+                                          if (canDeleteForEveryone) {
+                                            e.currentTarget.style.backgroundColor =
+                                              "rgba(239, 68, 68, 0.1)";
+                                          }
+                                        }}
+                                        onMouseLeave={(e) => {
                                           e.currentTarget.style.backgroundColor =
-                                            "rgba(239, 68, 68, 0.1)";
-                                        }
-                                      }}
-                                      onMouseLeave={(e) => {
-                                        e.currentTarget.style.backgroundColor =
-                                          "transparent";
-                                      }}
-                                      onClick={() =>
-                                        handleDeleteMessage(
-                                          msg.id,
-                                          msg.createdAt,
-                                        )
-                                      }
-                                      disabled={!canDeleteForEveryone}
-                                    >
-                                      <svg
-                                        className="w-4 h-4"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
+                                            "transparent";
+                                        }}
+                                        onClick={() => {
+                                          setEditingMessage({
+                                            id: msg.id,
+                                            text: msg.text || "",
+                                          });
+                                          setMessageDropdown(null);
+                                        }}
+                                        disabled={!canDeleteForEveryone}
                                       >
-                                        <path
-                                          strokeLinecap="round"
-                                          strokeLinejoin="round"
-                                          strokeWidth={2}
-                                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                                        />
-                                      </svg>
-                                      <span className="text-sm font-medium">
-                                        Delete Message
-                                        {!canDeleteForEveryone && " (Expired)"}
-                                      </span>
-                                    </button>
+                                        <Edit2Icon className="w-4 h-4"></Edit2Icon>
+                                        <span className="text-sm font-medium">
+                                          Edit Message
+                                          {!canDeleteForEveryone &&
+                                            " (Expired)"}
+                                        </span>
+                                      </button>
+                                      <button
+                                        className="w-full px-4 py-1 flex items-center gap-3 transition-colors duration-150"
+                                        style={{
+                                          color: canDeleteForEveryone
+                                            ? "var(--danger)"
+                                            : "var(--text-muted)",
+                                          opacity: canDeleteForEveryone
+                                            ? 1
+                                            : 0.5,
+                                        }}
+                                        onMouseEnter={(e) => {
+                                          if (canDeleteForEveryone) {
+                                            e.currentTarget.style.backgroundColor =
+                                              "rgba(239, 68, 68, 0.1)";
+                                          }
+                                        }}
+                                        onMouseLeave={(e) => {
+                                          e.currentTarget.style.backgroundColor =
+                                            "transparent";
+                                        }}
+                                        onClick={() =>
+                                          handleDeleteMessage(
+                                            msg.id,
+                                            msg.createdAt,
+                                          )
+                                        }
+                                        disabled={!canDeleteForEveryone}
+                                      >
+                                        <svg
+                                          className="w-4 h-4"
+                                          fill="none"
+                                          stroke="currentColor"
+                                          viewBox="0 0 24 24"
+                                        >
+                                          <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth={2}
+                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                                          />
+                                        </svg>
+                                        <span className="text-sm font-medium">
+                                          Delete Message
+                                          {!canDeleteForEveryone &&
+                                            " (Expired)"}
+                                        </span>
+                                      </button>
+                                    </>
                                   );
                                 })()}
 
@@ -1142,6 +1174,147 @@ const ChatDashboard = () => {
         <div ref={bottomRef} />
       </div>
 
+      {/* ===== EDIT BAR (shown when editing a message) ===== */}
+      {editingMessage ? (
+        <div
+          className="px-4 py-3 border-t flex items-center gap-3"
+          style={{
+            backgroundColor: "var(--bg-card)",
+            borderColor: "var(--border-main)",
+          }}
+        >
+          {/* Pencil indicator */}
+          <div
+            className="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center"
+            style={{
+              background: "rgba(45,212,191,0.12)",
+              color: "var(--accent-primary)",
+            }}
+          >
+            <Edit2Icon size={15} />
+          </div>
+
+          {/* Edit input */}
+          <input
+            autoFocus
+            value={editingMessage.text}
+            onChange={(e) =>
+              setEditingMessage((prev) => ({ ...prev, text: e.target.value }))
+            }
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                if (editingMessage.text.trim()) {
+                  editMessageMutation.mutate({
+                    messageId: editingMessage.id,
+                    text: editingMessage.text.trim(),
+                    conversationId,
+                  });
+                }
+              }
+              if (e.key === "Escape") setEditingMessage(null);
+            }}
+            placeholder="Edit message..."
+            className="flex-1 px-3 py-2 rounded-xl outline-none text-[15px]"
+            style={{
+              backgroundColor: "var(--bg-input)",
+              color: "var(--text-main)",
+              border: "1px solid var(--border-focus)",
+              boxShadow: "0 0 0 3px rgba(45,212,191,0.1)",
+            }}
+          />
+
+          {/* Cancel */}
+          <button
+            type="button"
+            onClick={() => setEditingMessage(null)}
+            className="flex-shrink-0 p-2 rounded-lg transition-all"
+            style={{
+              color: "var(--text-muted)",
+              background: "var(--bg-input)",
+            }}
+            onMouseEnter={(e) =>
+              (e.currentTarget.style.color = "var(--danger)")
+            }
+            onMouseLeave={(e) =>
+              (e.currentTarget.style.color = "var(--text-muted)")
+            }
+          >
+            <X size={16} />
+          </button>
+
+          {/* Save */}
+          <button
+            type="button"
+            disabled={
+              !editingMessage.text.trim() || editMessageMutation.isLoading
+            }
+            onClick={() => {
+              if (editingMessage.text.trim()) {
+                editMessageMutation.mutate({
+                  messageId: editingMessage.id,
+                  text: editingMessage.text.trim(),
+                  conversationId,
+                });
+              }
+            }}
+            className="flex-shrink-0 px-4 py-2 rounded-xl font-semibold text-sm transition-all disabled:opacity-50"
+            style={{
+              background:
+                "linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%)",
+              color: "#020617",
+            }}
+            onMouseEnter={(e) => {
+              if (!editMessageMutation.isLoading)
+                e.currentTarget.style.transform = "scale(1.04)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = "scale(1)";
+            }}
+          >
+            {editMessageMutation.isLoading ? "Saving…" : "Save"}
+          </button>
+        </div>
+      ) : previews && previews.length > 0 ? (
+        // ... your existing image previews JSX unchanged ...
+        <div
+          className="px-4 py-3 border-t flex gap-3 flex-wrap backdrop-blur-xl"
+          style={{
+            backgroundColor: "var(--bg-card)",
+            borderColor: "var(--border-divider)",
+          }}
+        >
+          {previews.map((src, idx) => (
+            <div
+              key={`preview-${idx}-${Date.now()}`}
+              className="relative group image-preview-item"
+              style={{ animation: "fadeIn 0.2s ease-in" }}
+            >
+              <img
+                src={src}
+                alt={`preview ${idx + 1}`}
+                className="w-20 h-20 object-cover rounded-xl border-2 shadow-md"
+                style={{ borderColor: "var(--border-focus)" }}
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  const newImages = images.filter((_, i) => i !== idx);
+                  const newPreviews = previews.filter((_, i) => i !== idx);
+                  setImages(newImages.length ? newImages : []);
+                  setPreviews(newPreviews.length ? newPreviews : []);
+                  if (newImages.length === 0 && fileInputRef.current)
+                    fileInputRef.current.value = null;
+                }}
+                className="absolute -top-2 -right-2 w-6 h-6 rounded-full flex items-center justify-center shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                style={{ backgroundColor: "var(--danger)", color: "white" }}
+              >
+                <X size={14} />
+              </button>
+            </div>
+          ))}
+        </div>
+      ) : null}
       {/* ================= IMAGE PREVIEWS ================= */}
       {previews && previews.length > 0 && (
         <div

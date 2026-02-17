@@ -107,3 +107,9 @@ export const markRead = async (conversationId, lastMessageId) => {
     lastMessageId,
   });
 };
+
+export const editMessage= async({ messageId, text, conversationId }) =>{
+  await api.post("/edit/message",{
+    messageId,text,conversationId,
+  });
+}
