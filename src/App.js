@@ -13,6 +13,7 @@ import { useStore } from "react-redux";
 import { useEffect } from "react";
 import { registerSocketHandlers } from "./socket/registerSocketHandler";
 import ChatGallery from "./Component/Chat/chatGallery";
+import AdminDashboard from "./Component/Dashboard/admin"
 
 function App() {
   const socket = useSocket();
@@ -39,6 +40,7 @@ function App() {
           <Route path="/image-view" element={<ImageView />} />
           <Route path="/editProfile" element={<EditProfile />} />
           <Route path="/gallery/:conversationId" element={<ChatGallery />} />
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
         </Route>
       </Routes>
     </BrowserRouter>

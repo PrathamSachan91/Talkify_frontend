@@ -1,4 +1,4 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -10,9 +10,12 @@ import { setUser, logout } from "../redux/AuthSlice";
 
 function Static() {
   const dispatch = useDispatch();
-  const user=useSelector((state)=>state.auth.user);
+  const auth = useSelector((state) => state.auth);
+  const location = useLocation();
 
-  const { data, isLoading } = useQuery({
+  const isAdminRoute = location.pathname.startsWith("/admin");
+
+  const { data, isLoading, isError } = useQuery({
     queryKey: ["me"],
     queryFn: fetchMe,
     retry: false,
@@ -22,12 +25,13 @@ function Static() {
     if (data) {
       dispatch(setUser({ user: data }));
     }
-    else {
+    if (isError) {
       dispatch(logout());
     }
-  }, [data,  dispatch]);
+  }, [data, isError, dispatch]);
 
-  if (isLoading) {
+  // 🔒 HARD GUARD — do not render layout until auth is resolved
+  if (isLoading || !auth.user) {
     return (
       <div className="h-screen flex flex-col items-center justify-center gap-4">
         <div className="loader" />
@@ -43,9 +47,10 @@ function Static() {
       <Navbar />
 
       <div className="flex flex-1 overflow-hidden">
-        {user && <SideBar />}
+        {!isAdminRoute && <SideBar />}
         <Outlet />
       </div>
+
       <Footer />
     </div>
   );
