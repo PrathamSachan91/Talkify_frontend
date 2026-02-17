@@ -19,8 +19,6 @@ import {
   Forward,
   Reply,
   Edit2Icon,
-  Edit,
-  Edit3Icon,
 } from "lucide-react";
 import {
   fetchMessages,
