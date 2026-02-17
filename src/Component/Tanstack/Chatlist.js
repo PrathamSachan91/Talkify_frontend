@@ -6,7 +6,6 @@ export const fetchUsers = async () => {
   return res.data.users;
 };
 
-
 /* Get or create conversation */
 export const getConversation = async (userId) => {
   const res = await api.post("/chat/getconversation", { userId });
@@ -16,7 +15,7 @@ export const getConversation = async (userId) => {
 /* Fetch messages of a conversation */
 export const fetchMessages = async (conversationId) => {
   const res = await api.get(`/chat/messages/${conversationId}`);
-  return res.data; 
+  return res.data;
 };
 
 export const sendMessage = async ({ conversationId, text, images }) => {
@@ -32,7 +31,6 @@ export const sendMessage = async ({ conversationId, text, images }) => {
 
   return res.data;
 };
-
 
 /* Fetch conversation meta */
 export const fetchConversationMeta = async (conversationId) => {
@@ -58,18 +56,18 @@ export const getGroup = async (payload) => {
 };
 
 export const deleteChat = async (conversationId) => {
-  await api.post("/deleteConversation",{conversationId,});
+  await api.post("/deleteConversation", { conversationId });
   // return res.data;
-}
+};
 
-export const deleteMessageMe =async(messageId,conversationId)=> {
-  await api.post("/deleteMessageMe",{messageId,conversationId});
+export const deleteMessageMe = async (messageId, conversationId) => {
+  await api.post("/deleteMessageMe", { messageId, conversationId });
   // return res.data;
-}
+};
 
-export const deleteMessage= async(messageId,conversationId)=> {
-  await api.post("/deleteMessage",{messageId,conversationId});
-}
+export const deleteMessage = async (messageId, conversationId) => {
+  await api.post("/deleteMessage", { messageId, conversationId });
+};
 
 export const fetchBroadcast = async () => {
   const res = await api.get("/boardcastList");
@@ -81,12 +79,16 @@ export const fetchConversationImages = async (conversationId) => {
   return response.data;
 };
 
-export const editGroup = async ({ group_name, group_image,conversation_id }) => {
+export const editGroup = async ({
+  group_name,
+  group_image,
+  conversation_id,
+}) => {
   const formData = new FormData();
 
   if (group_name) formData.append("group_name", group_name);
   if (group_image) formData.append("group_image", group_image);
-  formData.append("conversation_id",conversation_id);
+  formData.append("conversation_id", conversation_id);
 
   const res = await api.post("/editGroup", formData, {
     headers: { "Content-Type": "multipart/form-data" },
@@ -95,7 +97,14 @@ export const editGroup = async ({ group_name, group_image,conversation_id }) => 
   return res.data;
 };
 
-export const fetchConversation = async() => {
-  const response =api.get("/lastMessage");
-  return (await response).data;
-}
+export const fetchConversation = async () => {
+  const response = await api.get("/conversations/unread");
+  return response.data;
+};
+
+export const markRead = async (conversationId, lastMessageId) => {
+  await api.post("/conversations/mark-read", {
+    conversationId: Number(conversationId),
+    lastMessageId,
+  });
+};

@@ -25,6 +25,7 @@ import {
   deleteChat,
   deleteMessage,
   deleteMessageMe,
+  markRead,
 } from "../Tanstack/Chatlist";
 import bg from "../../utils/background.jpg";
 import EditProfileModal from "../EditProfile/editProfile";
@@ -122,9 +123,31 @@ const ChatDashboard = () => {
     queryKey: ["messages", conversationId],
     queryFn: () => fetchMessages(conversationId),
     enabled: !!conversationId,
-    refetchOnMount:'always',
+    refetchOnMount: "always",
     staleTime: 0,
   });
+
+  const { mutate: markAsRead } = useMutation({
+    mutationFn: ({ conversationId, lastMessageId }) =>
+      markRead(conversationId, lastMessageId),
+
+    onError: (error) => {
+      console.error("Failed to mark as read:", error);
+    },
+  });
+
+  useEffect(() => {
+    if (!messages.length || !conversationId) return;
+
+    const lastMessage = messages[messages.length - 1];
+
+    if (lastMessage?.id && lastMessage.sender_id !== currentUser?.auth_id) {
+      markAsRead({
+        conversationId: Number(conversationId),
+        lastMessageId: lastMessage.id,
+      });
+    }
+  }, [messages, conversationId, currentUser?.auth_id,markAsRead]);
 
   useEffect(() => {
     if (!socket || !conversationId) return;
@@ -159,6 +182,7 @@ const ChatDashboard = () => {
     return () => {
       socket.off("receive_message", handleReceive);
       socket.off("user_typing", handleTypingEvent);
+      socket.off("delete_message", handleReceive);
     };
   }, [socket, conversationId, currentUser, queryClient]);
 
@@ -813,11 +837,15 @@ const ChatDashboard = () => {
                             color: isMe ? "#020617" : "var(--text-muted)",
                           }}
                         >
-                          {msg.createdAt && !isNaN(new Date(msg.createdAt).getTime())
-                            ? new Date(msg.createdAt).toLocaleTimeString("en-US", {
-                                hour: "2-digit",
-                                minute: "2-digit",
-                              })
+                          {msg.createdAt &&
+                          !isNaN(new Date(msg.createdAt).getTime())
+                            ? new Date(msg.createdAt).toLocaleTimeString(
+                                "en-US",
+                                {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                },
+                              )
                             : ""}
                         </span>
                         {isMe && (

@@ -8,7 +8,7 @@ import {
   getGroup,
   fetchConversation,
 } from "../Tanstack/Chatlist";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import { useSocket } from "../../socket/socketContext";
 import CreateGroupModal from "./groupModal";
@@ -25,6 +25,7 @@ const SideBar = () => {
   const [openingUserId, setOpeningUserId] = useState(null);
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
+  const { conversationId: currentConversationId } = useParams();
 
   /* ---------------- FETCH USERS ---------------- */
   const { data: users = [], isLoading } = useQuery({
@@ -98,6 +99,7 @@ const SideBar = () => {
     };
   }, [socket, queryClient]);
 
+  /* ---------------- SOCKET: LAST MESSAGE & UNREAD ---------------- */
   useEffect(() => {
     if (!socket) return;
 
@@ -111,6 +113,7 @@ const SideBar = () => {
                 ...conv,
                 last_message: data.text,
                 updatedAt: data.updatedAt,
+                last_sender: data.last_sender,
               }
             : conv,
         );
@@ -120,10 +123,44 @@ const SideBar = () => {
         );
       });
     };
-    socket.on("last_message", handleLastMessage);
 
-    return () => socket.off("last_message", handleLastMessage);
-  }, [socket, queryClient]);
+    const handleUnreadIncrement = ({ conversationId, senderId }) => {
+      const cid = Number(conversationId);
+      const currentCid = Number(currentConversationId);
+
+      if (senderId === currentUser.auth_id || currentCid === cid) {
+        return;
+      }
+
+      queryClient.setQueryData(["conversations"], (old) => {
+        if (!Array.isArray(old)) return old;
+
+        return old.map((c) =>
+          Number(c.conversation_id) === cid
+            ? { ...c, unread_count: (c.unread_count || 0) + 1 }
+            : c,
+        );
+      });
+    };
+
+    const handleConversationRead = ({ conversationId }) => {
+      queryClient.setQueryData(["conversations"], (old = []) =>
+        old.map((c) =>
+          c.conversation_id === conversationId ? { ...c, unread_count: 0 } : c,
+        ),
+      );
+    };
+
+    socket.on("last_message", handleLastMessage);
+    socket.on("unread_increment", handleUnreadIncrement);
+    socket.on("conversation_read", handleConversationRead);
+
+    return () => {
+      socket.off("last_message", handleLastMessage);
+      socket.off("unread_increment", handleUnreadIncrement);
+      socket.off("conversation_read", handleConversationRead);
+    };
+  }, [socket, queryClient, currentUser.auth_id, currentConversationId]);
 
   // Memoize filtered users
   const filteredUsers = useMemo(
@@ -355,21 +392,37 @@ const SideBar = () => {
                     e.currentTarget.style.transform = "translateX(0)";
                   }}
                 >
-                  <div
-                    className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-base shadow-sm"
-                    style={{
-                      backgroundColor: "var(--accent-primary)",
-                      color: "#020617",
-                    }}
-                  >
-                    {group.group_image ? (
-                      <img
-                        src={group.group_image}
-                        alt={group.group_name}
-                        className="w-full h-full object-cover rounded-full"
-                      />
-                    ) : (
-                      <span>{group.group_name?.charAt(0).toUpperCase()}</span>
+                  <div className="relative">
+                    <div
+                      className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-base shadow-sm"
+                      style={{
+                        backgroundColor: "var(--accent-primary)",
+                        color: "#020617",
+                      }}
+                    >
+                      {group.group_image ? (
+                        <img
+                          src={group.group_image}
+                          alt={group.group_name}
+                          className="w-full h-full object-cover rounded-full"
+                        />
+                      ) : (
+                        <span>{group.group_name?.charAt(0).toUpperCase()}</span>
+                      )}
+                    </div>
+
+                    {/* Unread badge for groups */}
+                    {conv?.unread_count > 0 && (
+                      <div
+                        className="absolute -top-1 -right-1 min-w-[18px] h-[18px] flex items-center justify-center rounded-full text-[10px] font-bold"
+                        style={{
+                          backgroundColor: "#ef4444",
+                          color: "white",
+                          padding: "0 4px",
+                        }}
+                      >
+                        {conv.unread_count > 99 ? "99+" : conv.unread_count}
+                      </div>
                     )}
                   </div>
 
@@ -431,14 +484,30 @@ const SideBar = () => {
                     e.currentTarget.style.transform = "translateX(0)";
                   }}
                 >
-                  <div
-                    className="w-10 h-10 rounded-full flex items-center justify-center text-xl shadow-sm"
-                    style={{
-                      backgroundColor: "var(--accent-primary)",
-                      color: "#020617",
-                    }}
-                  >
-                    📢
+                  <div className="relative">
+                    <div
+                      className="w-10 h-10 rounded-full flex items-center justify-center text-xl shadow-sm"
+                      style={{
+                        backgroundColor: "var(--accent-primary)",
+                        color: "#020617",
+                      }}
+                    >
+                      📢
+                    </div>
+
+                    {/* Unread badge for broadcast */}
+                    {conv?.unread_count > 0 && (
+                      <div
+                        className="absolute -top-1 -right-1 min-w-[18px] h-[18px] flex items-center justify-center rounded-full text-[10px] font-bold"
+                        style={{
+                          backgroundColor: "#ef4444",
+                          color: "white",
+                          padding: "0 4px",
+                        }}
+                      >
+                        {conv.unread_count > 99 ? "99+" : conv.unread_count}
+                      </div>
+                    )}
                   </div>
 
                   <div className="flex-1 min-w-0">
@@ -536,7 +605,7 @@ const SideBar = () => {
                     )}
                   </div>
 
-                  {/* ✅ Online indicator */}
+                  {/* Online indicator */}
                   {isOnline && (
                     <div
                       className="absolute bottom-0 right-0 w-3 h-3 rounded-full border-2"
@@ -545,6 +614,20 @@ const SideBar = () => {
                         borderColor: "var(--bg-card)",
                       }}
                     />
+                  )}
+
+                  {/* Unread badge - FIXED position outside avatar */}
+                  {conv?.unread_count > 0 && (
+                    <div
+                      className="absolute -top-1 -right-1 min-w-[18px] h-[18px] flex items-center justify-center rounded-full text-[10px] font-bold"
+                      style={{
+                        backgroundColor: "#ef4444",
+                        color: "white",
+                        padding: "0 4px",
+                      }}
+                    >
+                      {conv.unread_count > 99 ? "99+" : conv.unread_count}
+                    </div>
                   )}
                 </div>
 
