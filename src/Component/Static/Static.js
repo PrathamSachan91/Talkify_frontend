@@ -30,8 +30,7 @@ function Static() {
     }
   }, [data, isError, dispatch]);
 
-  // 🔒 HARD GUARD — do not render layout until auth is resolved
-  if (isLoading || !auth.user) {
+  if (isLoading) {
     return (
       <div className="h-screen flex flex-col items-center justify-center gap-4">
         <div className="loader" />
@@ -47,7 +46,7 @@ function Static() {
       <Navbar />
 
       <div className="flex flex-1 overflow-hidden">
-        {!isAdminRoute && <SideBar />}
+        {!isAdminRoute && auth.user && <SideBar />}
         <Outlet />
       </div>
 
