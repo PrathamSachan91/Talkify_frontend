@@ -79,9 +79,9 @@ const Navbar = () => {
                   </span>
                   <span
                     className="text-xs opacity-60"
-                    style={{ color: "var(--text-muted)" }}
+                    style={{color: user.user_status === "Active" ? "var(--accent-primary)" : "red", fontWeight:"700"}}
                   >
-                    Online
+                    {user.user_status}
                   </span>
                 </div>
 

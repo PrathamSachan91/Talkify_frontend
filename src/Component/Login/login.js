@@ -2,7 +2,14 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../api/api";
 import { GoogleLogin } from "@react-oauth/google";
-import { MessageCircle, Mail, Lock, ArrowLeft, CheckCircle, XCircle } from "lucide-react";
+import {
+  MessageCircle,
+  Mail,
+  Lock,
+  ArrowLeft,
+  CheckCircle,
+  XCircle,
+} from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 
 function Login() {
@@ -13,7 +20,7 @@ function Login() {
 
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  
+
   const showAlert = (msg, type) => {
     setAlert({ msg, type });
     setTimeout(() => setAlert({ msg: "", type: "" }), 1500);
@@ -129,15 +136,19 @@ function Login() {
           >
             Welcome back
           </h2>
-          <p className="text-sm text-center" style={{ color: "var(--text-muted)" }}>
+          <p
+            className="text-sm text-center"
+            style={{ color: "var(--text-muted)" }}
+          >
             Log in to continue to Talkify
           </p>
         </div>
 
         {/* Alert */}
-        {alert.msg && <div
-          className="absolute top-4 right-4 px-4 py-2 rounded-lg flex items-center gap-2 animate-slide-in shadow-lg z-50"
-          style={{
+        {alert.msg && (
+          <div
+            className="absolute top-4 right-4 px-4 py-2 rounded-lg flex items-center gap-2 animate-slide-in shadow-lg z-50"
+            style={{
               backgroundColor:
                 alert.type === "success"
                   ? "rgba(34,197,94,0.15)"
@@ -150,16 +161,15 @@ function Login() {
                   : "rgba(239,68,68,0.3)"
               }`,
             }}
-        >
-          {alert.type === "success" ? (
+          >
+            {alert.type === "success" ? (
               <CheckCircle className="w-4 h-4" />
             ) : (
               <XCircle className="w-4 h-4" />
             )}
-          <span className="text-sm font-semibold">
-            {alert.msg}
-          </span>
-        </div>}
+            <span className="text-sm font-semibold">{alert.msg}</span>
+          </div>
+        )}
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-5">
@@ -175,7 +185,10 @@ function Login() {
               <Mail
                 className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5"
                 style={{
-                  color: focusedField === "email" ? "var(--accent-primary)" : "var(--text-muted)",
+                  color:
+                    focusedField === "email"
+                      ? "var(--accent-primary)"
+                      : "var(--text-muted)",
                   transition: "color 0.2s",
                 }}
               />
@@ -193,7 +206,9 @@ function Login() {
                   backgroundColor: "var(--bg-input)",
                   color: "var(--text-main)",
                   border: `2px solid ${
-                    focusedField === "email" ? "var(--accent-primary)" : "var(--border-input)"
+                    focusedField === "email"
+                      ? "var(--accent-primary)"
+                      : "var(--border-input)"
                   }`,
                 }}
               />
@@ -212,7 +227,10 @@ function Login() {
               <Lock
                 className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5"
                 style={{
-                  color: focusedField === "password" ? "var(--accent-primary)" : "var(--text-muted)",
+                  color:
+                    focusedField === "password"
+                      ? "var(--accent-primary)"
+                      : "var(--text-muted)",
                   transition: "color 0.2s",
                 }}
               />
@@ -230,7 +248,9 @@ function Login() {
                   backgroundColor: "var(--bg-input)",
                   color: "var(--text-main)",
                   border: `2px solid ${
-                    focusedField === "password" ? "var(--accent-primary)" : "var(--border-input)"
+                    focusedField === "password"
+                      ? "var(--accent-primary)"
+                      : "var(--border-input)"
                   }`,
                 }}
               />
@@ -258,7 +278,8 @@ function Login() {
               color: "#020617",
             }}
             onMouseEnter={(e) => {
-              if (!isLoading) e.currentTarget.style.transform = "translateY(-2px)";
+              if (!isLoading)
+                e.currentTarget.style.transform = "translateY(-2px)";
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.transform = "translateY(0)";
@@ -277,14 +298,20 @@ function Login() {
 
         {/* Divider */}
         <div className="my-5 flex items-center gap-3">
-          <div className="flex-1 h-px" style={{ backgroundColor: "var(--border-main)" }} />
+          <div
+            className="flex-1 h-px"
+            style={{ backgroundColor: "var(--border-main)" }}
+          />
           <span
             className="text-xs font-medium uppercase tracking-wider"
             style={{ color: "var(--text-muted)" }}
           >
             Or continue with
           </span>
-          <div className="flex-1 h-px" style={{ backgroundColor: "var(--border-main)" }} />
+          <div
+            className="flex-1 h-px"
+            style={{ backgroundColor: "var(--border-main)" }}
+          />
         </div>
 
         {/* Google Login */}

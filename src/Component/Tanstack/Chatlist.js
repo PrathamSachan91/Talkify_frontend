@@ -113,8 +113,3 @@ export const editMessage= async({ messageId, text, conversationId }) =>{
     messageId,text,conversationId,
   });
 }
-
-export const fetchAllGroups = async () => {
-  const res = await api.get("/allGroup");
-  return res.data;
-};
